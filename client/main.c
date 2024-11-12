@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "create_torrent.h"
+#include "make_torrent.h"
 
 int main(int argc, char *argv[]) {
     if (argc == 2) {

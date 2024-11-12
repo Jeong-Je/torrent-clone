@@ -3,7 +3,7 @@
 #include <libgen.h> // basename 함수를 위해서 사용
 #include <sys/stat.h>
 
-#include "create_torrent.h"
+#include "make_torrent.h"
 
 void create_torrent(char *file_path, char *tracker_url) {
         struct stat file_stat; // stat 구조체 선언
