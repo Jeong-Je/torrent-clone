@@ -1,5 +1,5 @@
-TARGET = client
-SRC = main.c create_torrent.c bencode.c
+TARGET = torrent
+SRC = main.c make_torrent.c bencode.c
 
 all: ${TARGET}
 
