@@ -59,6 +59,6 @@ void create_torrent(char *file_path, char *tracker_url) {
 
 
         printf("파일 이름:%s\n", filename);
-        printf("파일 크기:%ld 바이트\n", file_stat.st_size);
+        printf("파일 크기:%lld 바이트\n", file_stat.st_size);
         printf("%s 파일을 정상적으로 생성하였습니다.\n", torrent_file);
 }
