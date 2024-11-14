@@ -1,13 +1,13 @@
 #include "init_server.h"
 #include "handle_client.h"
 
-//tracker server configuration file
 int init_server(){
 
         struct sockaddr_in server_address, client_address;
         int server_socket;
 	int clientlen = sizeof(client_address);
 
+	//socket 생성
         server_socket = socket(AF_INET, SOCK_STREAM, 0);
         if(server_socket == -1){
 
@@ -16,8 +16,9 @@ int init_server(){
 
         server_address.sin_family = AF_INET;
         server_address.sin_port = htons(PORTNUM);
-        server_address.sin_addr.s_addr = inet_addr("113.198.138.212");
+        server_address.sin_addr.s_addr = inet_addr("0.0.0.0");
 
+	//바인딩
         if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0){
 
                 perror("bind err");
@@ -25,6 +26,7 @@ int init_server(){
                 exit(1);
         }
 
+	//listen
         if(listen(server_socket, CLIENT_MAX) < 0){
 
                 perror("listen err");
