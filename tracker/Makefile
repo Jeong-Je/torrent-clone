@@ -1,7 +1,11 @@
-all:main
+SRC = main.c init_server.c handle_client.c
 
-main:main.c
-	gcc -Wall -o main main.c
+TARGET = main
+
+all:${TARGET}
+
+${TARGET}:${SRC}
+	gcc -Wall -o ${TARGET} ${SRC}
 
 clean:
-	rm main
+	rm ${TARGET}

@@ -24,5 +24,18 @@ int handle_client(int *new_socket){
 			
 			//시드 리스트 추가 구현
 		}
+
+	} else if (pid > 0){
+	
+		wait(NULL);
+		
+
+	} else{
+	
+		perror("fork err"); exit(1);
 	}
+
+
+
+	return 0;
 }

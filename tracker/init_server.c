@@ -7,7 +7,6 @@ int init_server(){
         struct sockaddr_in server_address, client_address;
         int server_socket;
 	int clientlen = sizeof(client_address);
-	new_socket;
 
         server_socket = socket(AF_INET, SOCK_STREAM, 0);
         if(server_socket == -1){
@@ -16,8 +15,8 @@ int init_server(){
         }
 
         server_address.sin_family = AF_INET;
-        server_address.sin_port = hton(PORT);
-        server_address.sin_addr.s_addr = "113.198.138.212";
+        server_address.sin_port = htons(PORTNUM);
+        server_address.sin_addr.s_addr = inet_addr("113.198.138.212");
 
         if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address)) < 0){
 
@@ -26,7 +25,7 @@ int init_server(){
                 exit(1);
         }
 
-        if(listen(server_socket, CLIENT_NUM) < 0){
+        if(listen(server_socket, CLIENT_MAX) < 0){
 
                 perror("listen err");
                 close(server_socket);
@@ -35,7 +34,7 @@ int init_server(){
 
 	while(1){
 
-		int new_socket = accept(server_socket, (struct sockaddr*)&client_socket, &clientlen);
+		int new_socket = accept(server_socket, (struct sockaddr*)&client_address, (socklen_t *)&clientlen);
 		
 		if(new_socket<0){
 
