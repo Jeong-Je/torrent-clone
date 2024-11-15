@@ -5,6 +5,8 @@
 #include "make_torrent.h"
 #include "bdecode.h"
 #include "meta.h"
+#include "allocate_strorage.h"
+#include "download_piece.h"
 
 int main(int argc, char *argv[]) {
     if (argc == 3) {
@@ -26,6 +28,16 @@ int main(int argc, char *argv[]) {
 		} else {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
+		char temp_file_name[256];
+		allocate_storage(meta, temp_file_name);
+		char* piece_map = (char*)malloc(sizeof(char) * meta.piece_num);
+		memset(piece_map, 0, sizeof(char)*meta.piece_num);
+		for (int i=0; i<meta.piece_num; i++){
+			if (piece_map[i] == 0){
+			download_piece(meta, temp_file_name); 
+			}
+		}
+
 	} else {
 		fprintf(stderr, "인자 오류\n");
 		return 1;
