@@ -55,7 +55,6 @@ int download_piece(meta meta, char* temp_file_name){
 
 
     
-
     close(ns);
     close(sd);
 
