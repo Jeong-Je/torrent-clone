@@ -6,7 +6,8 @@
 
 #define PIECE_SIZE 131072  // 피스 사이즈 (128KB)
 #define BUFFER_SIZE 208000  // 송수신 버퍼 208KB 고정
-#define DELIMITER 0xFF  // 구분자 값
+#define DELIMITER "space"  // 구분자 값
+#define DELIMITER_SIZE 5   // 구분자 문자열의 길이
 
 // 피스를 전송하는 함수
 void send_piece(int sockfd, int piece_index, unsigned char *buffer, size_t bytes_read) {
@@ -18,8 +19,8 @@ void send_piece(int sockfd, int piece_index, unsigned char *buffer, size_t bytes
     offset += sizeof(piece_index);
 
     // 2. 구분자를 보내기
-    send_buffer[offset] = DELIMITER;
-    offset += 1;
+    memcpy(send_buffer + offset, DELIMITER, DELIMITER_SIZE);
+    offset += DELIMITER_SIZE;
 
     // 3. 피스 데이터를 보내기
     memcpy(send_buffer + offset, buffer, bytes_read);
@@ -89,6 +90,8 @@ void split_file_and_send(const char *filename, const char *server_ip, int server
 
         // 피스 데이터를 네트워크로 전송
         send_piece(sockfd, i, buffer, bytes_read);
+
+        // 추가적으로 수신 대기 및 재전송 처리 추가 가능
     }
 
     // 전송 완료 후 소켓 닫기
@@ -103,7 +106,7 @@ int main() {
 
     // 예시: 첫 번째 클라이언트는 피스 0~4까지, 두 번째 클라이언트는 피스 5~9까지 전송
     int start_index = 0;
-    int end_index = 5;
+    int end_index = 4;
     split_file_and_send(filename, server_ip, server_port, start_index, end_index);
 
     return 0;
