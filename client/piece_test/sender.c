@@ -3,8 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <stdint.h> // int64_t 사용을 위해 추가
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <stdint.h>
 
 #define PORT 8080
 #define CHUNK_SIZE 131072 // 128KB
@@ -21,8 +22,9 @@ void send_file_in_chunks(int client_socket, const char* filename) {
     ssize_t bytes_read;
 
     while ((bytes_read = read(file_fd, buffer, sizeof(buffer))) > 0) {
-        // 조각 크기를 64비트 정수로 전송
         int64_t chunk_size = bytes_read;
+
+        // 조각 크기 전송
         if (send(client_socket, &chunk_size, sizeof(chunk_size), 0) < 0) {
             perror("조각 크기 전송 실패");
             close(file_fd);
@@ -41,7 +43,7 @@ void send_file_in_chunks(int client_socket, const char* filename) {
         printf("전송한 조각 크기: %ld 바이트\n", bytes_read);
     }
 
-    // 전송 완료 표시를 위해 크기 0 전송
+    // 전송 완료 표시 (크기 0 전송)
     int64_t chunk_size = 0;
     send(client_socket, &chunk_size, sizeof(chunk_size), 0);
 
@@ -49,6 +51,26 @@ void send_file_in_chunks(int client_socket, const char* filename) {
     close(file_fd);
 }
 
+void send_file_with_size(int client_socket, const char* filename) {
+    // 파일 크기 확인
+    struct stat file_stat;
+    if (stat(filename, &file_stat) < 0) {
+        perror("파일 크기 확인 실패");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+    int64_t file_size = file_stat.st_size;
+
+    // 파일 크기 전송
+    if (send(client_socket, &file_size, sizeof(file_size), 0) < 0) {
+        perror("파일 크기 전송 실패");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+
+    // 조각 전송
+    send_file_in_chunks(client_socket, filename);
+}
 
 int main() {
     int server_fd, client_socket;
@@ -86,7 +108,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    send_file_in_chunks(client_socket, "test.txt"); // 전송할 파일 이름
+    send_file_with_size(client_socket, "test.txt"); // 전송할 파일 이름
     close(client_socket);
     close(server_fd);
 

@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdint.h> // int64_t 사용을 위해 추가
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <stdint.h>
 
 #define PORT 8080
 #define CHUNK_SIZE 131072 // 128KB
@@ -54,6 +55,32 @@ void receive_file_in_chunks(int server_socket, const char* output_filename) {
     close(file_fd);
 }
 
+void receive_file_with_size(int server_socket, const char* output_filename) {
+    int64_t expected_size;
+
+    // 파일 크기 수신
+    if (recv(server_socket, &expected_size, sizeof(expected_size), 0) <= 0) {
+        perror("파일 크기 수신 실패");
+        exit(EXIT_FAILURE);
+    }
+    printf("받을 파일 크기: %lld 바이트\n", expected_size);
+
+    // 파일 조각 수신
+    receive_file_in_chunks(server_socket, output_filename);
+
+    // 받은 파일 크기 확인
+    struct stat file_stat;
+    if (stat(output_filename, &file_stat) < 0) {
+        perror("수신 파일 크기 확인 실패");
+        exit(EXIT_FAILURE);
+    }
+
+    if (file_stat.st_size != expected_size) {
+        fprintf(stderr, "경고: 수신된 파일 크기 불일치! (%lld != %lld)\n", file_stat.st_size, expected_size);
+    } else {
+        printf("파일 크기 일치: %lld 바이트\n", file_stat.st_size);
+    }
+}
 
 int main() {
     int server_socket;
@@ -80,7 +107,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    receive_file_in_chunks(server_socket, "received_test.txt"); // 저장할 파일 이름
+    receive_file_with_size(server_socket, "received_test.txt"); // 저장할 파일 이름
     close(server_socket);
 
     return 0;
