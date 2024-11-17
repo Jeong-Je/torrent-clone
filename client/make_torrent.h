@@ -1,5 +1,5 @@
 #define FILE_SIZE 256
-#define PIECE_LENGTH 16384 // 16KB
+#define PIECE_LENGTH 131072 // 128KB
 
 #include "bencode.h"
 
