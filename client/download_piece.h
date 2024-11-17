@@ -1,8 +1,8 @@
-#ifndef DOWNLOAD_PIECE.H
-#define DOWNLOAD_PIECE.H
+#ifndef DOWNLOAD_PIECE_H
+#define DOWNLOAD_PIECE_H
 
 #include "meta.h" 
 
-char* download_piece(meta meta, char* temp_file_name);
+void download_piece(meta meta, char* temp_file_name);
 
 #endif

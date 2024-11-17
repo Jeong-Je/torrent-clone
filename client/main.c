@@ -5,13 +5,13 @@
 #include "make_torrent.h"
 #include "bdecode.h"
 #include "meta.h"
-#include "allocate_strorage.h"
+#include "allocate_storage.h"
 #include "download_piece.h"
 
 int main(int argc, char *argv[]) {
     if (argc == 3) {
 	char *option = argv[1]; 
-        char *file_path = argv[2];
+    char *file_path = argv[2];
 
 	// make 명령어
 	if(strcmp(option, "make") == 0) {
@@ -24,18 +24,28 @@ int main(int argc, char *argv[]) {
 			printf("file_length = %d\n", meta.file_length);
 			printf("piece_length = %d\n", meta.piece_length);
 			printf("piece_num = %d\n", meta.piece_num);
-			printf("메타데이터 파싱 완료.");
+			printf("메타데이터 파싱 완료.\n");
 		} else {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
 		char temp_file_name[256];
 		allocate_storage(meta, temp_file_name);
+		printf("temp file name: %s\n", temp_file_name);
 		char* piece_map = (char*)malloc(sizeof(char) * meta.piece_num);
 		memset(piece_map, 0, sizeof(char)*meta.piece_num);
 		for (int i=0; i<meta.piece_num; i++){
 			if (piece_map[i] == 0){
-			download_piece(meta, temp_file_name); 
+			download_piece(meta, temp_file_name);
+			piece_map[i] = 1;
 			}
+		}
+
+		
+		if (rename(temp_file_name, meta.name) == 0) {
+        printf("파일 이름이 성공적으로 변경되었습니다.");
+		} else {
+			perror("파일 이름 변경 실패");
+			exit(1);
 		}
 
 	} else {

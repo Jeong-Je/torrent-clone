@@ -3,6 +3,6 @@
 
 #include "meta.h" 
 
-char* allocate_storage(meta meta, char* temp_file_name);
+void allocate_storage(meta meta, char* temp_file_name);
 
 #endif

@@ -3,11 +3,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "meta.h"
-#include "allocate_strorage.h"
+#include "allocate_storage.h"
 
 void allocate_storage(meta meta, char* temp_file_name){
     sprintf(temp_file_name, "%s_temp_download_file", meta.name);
-    int fd = open(temp_file_name, O_CREAT | O_EXCL | O_WRONLY);
+    int fd = open(temp_file_name, O_CREAT | O_WRONLY, 0644);
     if (fd == -1){
         perror("파일을 생성하지 못하였습니다.\n");
         exit(1);
