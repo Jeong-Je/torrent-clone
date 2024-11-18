@@ -1,16 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdint.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #define PORT 8080
 #define CHUNK_SIZE 131072 // 128KB
 
-void send_file_in_chunks(int client_socket, const char* filename) {
+void send_file_with_index_and_size(int client_socket, const char* filename) {
     int file_fd = open(filename, O_RDONLY);
     if (file_fd < 0) {
         perror("파일 열기 실패");
@@ -18,13 +18,39 @@ void send_file_in_chunks(int client_socket, const char* filename) {
         exit(EXIT_FAILURE);
     }
 
+    // 파일 크기 확인
+    struct stat file_stat;
+    if (stat(filename, &file_stat) < 0) {
+        perror("파일 크기 확인 실패");
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+    int64_t file_size = file_stat.st_size;
+
+    // 파일 크기 전송
+    if (send(client_socket, &file_size, sizeof(file_size), 0) < 0) {
+        perror("파일 크기 전송 실패");
+        close(file_fd);
+        close(client_socket);
+        exit(EXIT_FAILURE);
+    }
+
+    // 조각 데이터 전송
     char buffer[CHUNK_SIZE];
     ssize_t bytes_read;
+    int64_t chunk_index = 0;
 
     while ((bytes_read = read(file_fd, buffer, sizeof(buffer))) > 0) {
-        int64_t chunk_size = bytes_read;
+        // 인덱스 전송
+        if (send(client_socket, &chunk_index, sizeof(chunk_index), 0) < 0) {
+            perror("인덱스 전송 실패");
+            close(file_fd);
+            close(client_socket);
+            exit(EXIT_FAILURE);
+        }
 
         // 조각 크기 전송
+        int64_t chunk_size = bytes_read;
         if (send(client_socket, &chunk_size, sizeof(chunk_size), 0) < 0) {
             perror("조각 크기 전송 실패");
             close(file_fd);
@@ -40,36 +66,16 @@ void send_file_in_chunks(int client_socket, const char* filename) {
             exit(EXIT_FAILURE);
         }
 
-        printf("전송한 조각 크기: %ld 바이트\n", bytes_read);
+        printf("전송한 조각: 인덱스=%lld, 크기=%ld 바이트\n", chunk_index, bytes_read);
+        chunk_index++;
     }
 
-    // 전송 완료 표시 (크기 0 전송)
-    int64_t chunk_size = 0;
-    send(client_socket, &chunk_size, sizeof(chunk_size), 0);
+    // 전송 완료 표시
+    int64_t end_marker = -1;
+    send(client_socket, &end_marker, sizeof(end_marker), 0);
 
     printf("파일 전송 완료: %s\n", filename);
     close(file_fd);
-}
-
-void send_file_with_size(int client_socket, const char* filename) {
-    // 파일 크기 확인
-    struct stat file_stat;
-    if (stat(filename, &file_stat) < 0) {
-        perror("파일 크기 확인 실패");
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-    int64_t file_size = file_stat.st_size;
-
-    // 파일 크기 전송
-    if (send(client_socket, &file_size, sizeof(file_size), 0) < 0) {
-        perror("파일 크기 전송 실패");
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-
-    // 조각 전송
-    send_file_in_chunks(client_socket, filename);
 }
 
 int main() {
@@ -108,7 +114,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    send_file_with_size(client_socket, "test.txt"); // 전송할 파일 이름
+    send_file_with_index_and_size(client_socket, "test.txt");
     close(client_socket);
     close(server_fd);
 
