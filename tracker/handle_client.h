@@ -11,7 +11,8 @@
 #include <sys/socket.h> // 소켓 프로그래밍 관련 함수 (socket, bind, recv 등)
 #include <arpa/inet.h>  // 주소 변환 (inet_ntoa, htons 등)
 #include <netinet/in.h> // sockaddr_in 구조체 (IP 소켓 주소 구조체)
+#include <sys/wait.h>
 
-int handle_client(int* new_socket);
+int handle_client(int* new_socket, int* server_socket);
 
 #endif

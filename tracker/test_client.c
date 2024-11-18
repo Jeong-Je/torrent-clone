@@ -17,14 +17,26 @@ int main(){
 	}
 
 	memset((char*)&client_address, '\0', sizeof(client_address));
-	sin.sin_family = AF_INET;
-	sin.sin_port = htons(PORTNUM);
-	sin.sin_addr.s_addr = inet_addr("113.198.138.212");
+	client_address.sin_family = AF_INET;
+	client_address.sin_port = htons(PORTNUM);
+	client_address.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-	if(connect(client_socket, (struct sock_addr*)&client_address, sizeof(client_address)) == -1){
+	if(connect(client_socket, (struct sockaddr*)&client_address, sizeof(client_address)) == -1){
 	
 		perror("connect err"); exit(1);
 	}
 
-	//send 로직 구현필요 및 인자값도 넣어줘야됨
+	printf("connect success\n");
+
+	char buf[256];
+	
+	printf("command : ");
+	scanf("%s", buf);
+
+	if(send(client_socket, buf, strlen(buf), 0) == -1){
+	
+		perror("send err"); exit(1);
+	}
+
+	close(client_socket);
 }

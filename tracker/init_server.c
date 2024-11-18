@@ -43,7 +43,7 @@ int init_server(){
 			perror("accept err"); exit(1);
 		}
 
-		handle_client(&new_socket);
+		handle_client(&new_socket, &server_socket);
 	}
 
 	return 0;
