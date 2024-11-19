@@ -38,5 +38,14 @@ int main(){
 		perror("send err"); exit(1);
 	}
 
+	char file_id[256];
+	printf("file id : ");
+	scanf("%s", file_id);
+
+	if(send(client_socket, file_id, strlen(file_id), 0) == -1){
+	
+		perror("send err"); exit(1);
+	}
+
 	close(client_socket);
 }

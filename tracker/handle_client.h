@@ -13,6 +13,8 @@
 #include <netinet/in.h> // sockaddr_in 구조체 (IP 소켓 주소 구조체)
 #include <sys/wait.h>
 
-int handle_client(int* new_socket, int* server_socket);
+int handle_client(int* new_socket, struct sockaddr_in* client_address);
+
+int recv_buf(int* new_socket, char* buf);
 
 #endif
