@@ -3,7 +3,6 @@
 #include<arpa/inet.h>
 #include<sys/un.h>
 #include<unistd.h>
-#include<string.h>
 
 #define PORTNUM 12344
 

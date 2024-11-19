@@ -1,7 +1,6 @@
 #include "handle_client.h"
 #include "update_seedlist.h"
 #include "is_seed.h"
-#include "give_seed.h"
 
 int handle_client(int *new_socket, struct sockaddr_in* client_address){
 
