@@ -1,5 +1,9 @@
 # 실행파일 깃에서 무시
 torrent
 
-# .dat
+# 테스트용 파일
 *.dat
+*_temp_download_file
+
+# OS-specific
+.DS_Store
