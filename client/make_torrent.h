@@ -3,4 +3,4 @@
 
 #include "bencode.h"
 
-void create_torrent(char *file_path, char *tracker_url, char *torrent_file);
+void create_torrent(char *file_path, char *torrent_file);
