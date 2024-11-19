@@ -13,7 +13,7 @@ void allocate_storage(meta meta, char* temp_file_name){
         perror("파일을 생성하지 못하였습니다.\n");
         exit(1);
     }
-    fallocate(fd, 0, 0, meta.file_length);
+    //fallocate(fd, 0, 0, meta.file_length);
 
     close(fd);
 }

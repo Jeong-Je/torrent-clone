@@ -1,21 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h> // basename 함수를 위해서 추가
 
 #include "make_torrent.h"
 #include "bdecode.h"
 #include "meta.h"
 #include "allocate_storage.h"
 #include "download_piece.h"
+#include "report_to_tracker.h"
 
 int main(int argc, char *argv[]) {
     if (argc == 3) {
 	char *option = argv[1]; 
     char *file_path = argv[2];
+	char torrent_path[256];
 
 	// make 명령어
 	if(strcmp(option, "make") == 0) {
-        	create_torrent(file_path, "113.198.138.212");
+        	create_torrent(file_path, "113.198.138.212", &torrent_path);
+			char* torrent_file = basename(torrent_path);
+
+			if(report_to_tracker(torrent_file)){
+				printf("트래커 서버로 보고 완료\n");
+			}else {
+				printf("트래커 서버로 보고 실패\n");
+			}
 	} else if(strcmp(option, "down") == 0) { // down 명령어
 		meta meta;
 		if(bdecode(&meta, file_path)){

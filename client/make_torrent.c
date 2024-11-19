@@ -5,7 +5,7 @@
 
 #include "make_torrent.h"
 
-void create_torrent(char *file_path, char *tracker_url) {
+void create_torrent(char *file_path, char *tracker_url, char *torrent_path) {
         struct stat file_stat; // stat 구조체 선언
 
         if(stat(file_path, &file_stat) == -1){
@@ -14,9 +14,8 @@ void create_torrent(char *file_path, char *tracker_url) {
         }
 
         // torrent 파일 open(생성)
-        char torrent_file[FILE_SIZE];
-        sprintf(torrent_file,"%s.torrent", file_path);
-        FILE *fp = fopen(torrent_file, "wb");
+        sprintf(torrent_path,"%s.torrent", file_path);
+        FILE *fp = fopen(torrent_path, "wb");
 
         // file_path에서 filename만 추출
         char* filename = basename(file_path);
@@ -60,5 +59,5 @@ void create_torrent(char *file_path, char *tracker_url) {
 
         printf("파일 이름:%s\n", filename);
         printf("파일 크기:%lld 바이트\n", file_stat.st_size);
-        printf("%s 파일을 정상적으로 생성하였습니다.\n", torrent_file);
+        printf("%s 파일을 정상적으로 생성하였습니다.\n", torrent_path);
 }
