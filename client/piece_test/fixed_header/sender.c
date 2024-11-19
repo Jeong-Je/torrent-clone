@@ -9,9 +9,9 @@
 
 #define PORT 8080
 #define CHUNK_SIZE 131072 // 128KB
-#define HEADER_SIZE 16 // 인덱스(8바이트) + 조각 크기(8바이트)
+#define HEADER_SIZE 16    // 인덱스(8바이트) + 조각 크기(8바이트)
 
-void send_file_with_fixed_header(int client_socket, const char* filename) {
+void send_specific_chunks(int client_socket, const char* filename, int64_t start_chunk, int64_t end_chunk) {
     int file_fd = open(filename, O_RDONLY);
     if (file_fd < 0) {
         perror("파일 열기 실패");
@@ -19,51 +19,42 @@ void send_file_with_fixed_header(int client_socket, const char* filename) {
         exit(EXIT_FAILURE);
     }
 
-    // 파일 크기 확인
-    struct stat file_stat;
-    if (stat(filename, &file_stat) < 0) {
-        perror("파일 크기 확인 실패");
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-    int64_t file_size = file_stat.st_size;
-
-    // 파일 크기 전송
-    if (send(client_socket, &file_size, sizeof(file_size), 0) < 0) {
-        perror("파일 크기 전송 실패");
-        close(file_fd);
-        close(client_socket);
-        exit(EXIT_FAILURE);
-    }
-
-    // 파일 조각 전송
     char buffer[CHUNK_SIZE + HEADER_SIZE];
     ssize_t bytes_read;
     int64_t chunk_index = 0;
 
     while ((bytes_read = read(file_fd, buffer + HEADER_SIZE, CHUNK_SIZE)) > 0) {
-        // 헤더 작성
-        memcpy(buffer, &chunk_index, sizeof(chunk_index));                  // 인덱스
-        memcpy(buffer + sizeof(chunk_index), &bytes_read, sizeof(bytes_read)); // 조각 크기
+        if (chunk_index >= start_chunk && chunk_index <= end_chunk) {
+            memcpy(buffer, &chunk_index, sizeof(chunk_index));                  // 인덱스
+            memcpy(buffer + sizeof(chunk_index), &bytes_read, sizeof(bytes_read)); // 크기
 
-        // 데이터 송신 (헤더 + 데이터)
-        ssize_t total_size = HEADER_SIZE + bytes_read;
-        if (send(client_socket, buffer, total_size, 0) < 0) {
-            perror("파일 조각 전송 실패");
-            close(file_fd);
-            close(client_socket);
-            exit(EXIT_FAILURE);
+            if (send(client_socket, buffer, HEADER_SIZE + bytes_read, 0) < 0) {
+                perror("조각 전송 실패");
+                close(file_fd);
+                close(client_socket);
+                exit(EXIT_FAILURE);
+            }
+            printf("송신: 조각 %ld (%ld 바이트)\n", chunk_index, bytes_read);
         }
-
-        printf("전송한 조각: 인덱스=%ld, 크기=%ld 바이트\n", chunk_index, bytes_read);
+        if (chunk_index > end_chunk) break;
         chunk_index++;
     }
 
-    printf("파일 전송 완료: %s\n", filename);
     close(file_fd);
+    close(client_socket);
+    printf("송신 완료: 조각 %ld~%ld\n", start_chunk, end_chunk);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc < 4) {
+        fprintf(stderr, "사용법: %s <파일이름> <시작조각> <끝조각>\n", argv[0]);
+        return 1;
+    }
+
+    const char* filename = argv[1];
+    int64_t start_chunk = atoll(argv[2]);
+    int64_t end_chunk = atoll(argv[3]);
+
     int server_fd, client_socket;
     struct sockaddr_in server_addr, client_addr;
     socklen_t addr_len = sizeof(client_addr);
@@ -90,8 +81,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    printf("서버가 파일 전송 대기 중입니다...\n");
-
+    printf("서버가 조각 전송 대기 중...\n");
     client_socket = accept(server_fd, (struct sockaddr*)&client_addr, &addr_len);
     if (client_socket < 0) {
         perror("클라이언트 연결 실패");
@@ -99,9 +89,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    send_file_with_fixed_header(client_socket, "test.txt");
-    close(client_socket);
+    send_specific_chunks(client_socket, filename, start_chunk, end_chunk);
     close(server_fd);
-
     return 0;
 }
