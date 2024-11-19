@@ -13,6 +13,6 @@
 #include <sys/socket.h> // 소켓 관련 함수 및 구조체
 #include <netinet/in.h> // sockaddr_in 구조체
 
-int init_server(char* command);
+int init_server();
 
 #endif

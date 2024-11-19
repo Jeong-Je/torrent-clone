@@ -1,7 +1,7 @@
 #include "init_server.h"
 #include "handle_client.h"
 
-int init_server(char* command){
+int init_server(){
 
         struct sockaddr_in server_address, client_address;
         int server_socket;
@@ -43,7 +43,7 @@ int init_server(char* command){
 			perror("accept err"); exit(1);
 		}
 
-		handle_client(command, &new_socket, &server_socket);
+		handle_client(&new_socket, &client_address);
 	}
 
 	return 0;
