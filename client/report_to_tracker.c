@@ -15,7 +15,7 @@ bool report_to_tracker(char * torrent_file){
     int sd;
     char buffer[256];
 
-    sprintf(buffer, "iam_seed : %s", torrent_file);
+    sprintf(buffer, "iam_seed:%s", torrent_file);
 
     struct sockaddr_in sin;
 
