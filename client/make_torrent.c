@@ -5,7 +5,7 @@
 
 #include "make_torrent.h"
 
-void create_torrent(char *file_path, char *torrent_path) {
+void create_torrent(char *file_path, char *tracker_url, char *torrent_path) {
         struct stat file_stat; // stat 구조체 선언
 
         if(stat(file_path, &file_stat) == -1){

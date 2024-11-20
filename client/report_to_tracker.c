@@ -13,11 +13,9 @@
 
 bool report_to_tracker(char * torrent_file){
     int sd;
-    char command[256] = "iam_seed";
-    char filename[256];
+    char buffer[256];
 
-    strncpy(filename, torrent_file, sizeof(filename) - 1);
-    filename[sizeof(filename) - 1] = '\0';
+    sprintf(buffer, "iam_seed : %s", torrent_file);
 
     struct sockaddr_in sin;
 
@@ -37,16 +35,12 @@ bool report_to_tracker(char * torrent_file){
         return false;
     }
     printf("3\n");
-    if(send(sd, command, strlen(command)+1, 0) == -1) {
+    if(send(sd, buffer, strlen(buffer)+1, 0) == -1) {
         perror("send");
         return false;
     }
+    
     printf("4\n");
-    if(send(sd, filename, strlen(filename) + 1, 0) == -1) {
-        perror("recv");
-        return false;
-    }
-    printf("5\n");
 
     close(sd);
 

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 
 	// make 명령어
 	if(strcmp(option, "make") == 0) {
-        	create_torrent(file_path, &torrent_path);
+        	create_torrent(file_path, "113.198.138.212", &torrent_path);
 			char* torrent_file = basename(torrent_path);
 
 			if(report_to_tracker(torrent_file)){
