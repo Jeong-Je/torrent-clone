@@ -11,8 +11,14 @@
 
 
 bool report_to_tracker(char * torrent_file){
+    char* port_num_str = get_env("SERVER_PORT");
+    int port_num = atoi(port_num_str);
+    free(port_num_str); // 메모리 반환
+
+    char* server_ip = get_env("SERVER_IP");
+
+
     int sd;
-    int port_num = atoi(get_env("SERVER_PORT"));
     char buffer[256];
 
     sprintf(buffer, "iam_seed:%s", torrent_file);
@@ -22,7 +28,8 @@ bool report_to_tracker(char * torrent_file){
     memset((char *)&sin, '\0', sizeof(sin));
     sin.sin_family = AF_INET;
     sin.sin_port = htons(port_num);
-    sin.sin_addr.s_addr = inet_addr(get_env("SERVER_IP"));
+    sin.sin_addr.s_addr = inet_addr(server_ip);
+    free(server_ip);
 
     printf("1\n");
     if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){

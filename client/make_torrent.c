@@ -29,6 +29,10 @@ void create_torrent(char *file_path, char *torrent_path) {
 
         char announce[100];
         snprintf(announce, sizeof(announce), "%s:%s", server_ip, server_port);
+        
+        // 동적할당한 거 free
+        free(server_ip);
+        free(server_port);
 
         bencode_string(fp, "announce");
         bencode_string(fp, announce);
