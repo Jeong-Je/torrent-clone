@@ -31,23 +31,20 @@ bool report_to_tracker(char * torrent_file){
     sin.sin_addr.s_addr = inet_addr(server_ip);
     free(server_ip);
 
-    printf("1\n");
     if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
         perror("socket");
         return false; 
     }
-    printf("2\n");
+    
     if(connect(sd, (struct sockaddr *)&sin, sizeof(sin))) {
         perror("connect");
         return false;
     }
-    printf("3\n");
+
     if(send(sd, buffer, strlen(buffer)+1, 0) == -1) {
         perror("send");
         return false;
     }
-    
-    printf("4\n");
 
     close(sd);
 
