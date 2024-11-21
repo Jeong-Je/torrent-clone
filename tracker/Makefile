@@ -1,6 +1,6 @@
-SRC = main.c init_server.c handle_client.c update_seedlist.c is_seed.c
+SRC = main.c
 
-TARGET = main
+TARGET = tracker
 
 all:${TARGET}
 
