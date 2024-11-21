@@ -8,5 +8,5 @@ torrent
 # OS-specific
 .DS_Store
 
-# config 파일 무시
-.config
+# env 파일 무시
+.env
