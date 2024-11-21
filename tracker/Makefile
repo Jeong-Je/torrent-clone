@@ -1,4 +1,4 @@
-SRC = main.c
+SRC = main.c update_seedlist.c
 
 TARGET = tracker
 

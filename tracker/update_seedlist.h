@@ -3,7 +3,10 @@
 
 #include<stdio.h>
 #include<stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
 
-int update_seedlist(const char* file_id, const char* client_ip);
+void *update_seedlist(void *data);
 
 #endif
