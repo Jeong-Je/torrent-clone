@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <sys/types.h>
@@ -8,11 +9,10 @@
 
 #include "report_to_tracker.h"
 
-#define PORTNUM 12344
-
 
 bool report_to_tracker(char * torrent_file){
     int sd;
+    int port_num = atoi(get_env("SERVER_PORT"));
     char buffer[256];
 
     sprintf(buffer, "iam_seed:%s", torrent_file);
@@ -21,8 +21,8 @@ bool report_to_tracker(char * torrent_file){
 
     memset((char *)&sin, '\0', sizeof(sin));
     sin.sin_family = AF_INET;
-    sin.sin_port = htons(PORTNUM);
-    sin.sin_addr.s_addr = inet_addr("113.198.138.212");
+    sin.sin_port = htons(port_num);
+    sin.sin_addr.s_addr = inet_addr(get_env("SERVER_IP"));
 
     printf("1\n");
     if ((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){

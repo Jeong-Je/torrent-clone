@@ -18,14 +18,14 @@ int main(int argc, char *argv[]) {
 
 	// make 명령어
 	if(strcmp(option, "make") == 0) {
-        	create_torrent(file_path, "113.198.138.212", &torrent_path);
+        	create_torrent(file_path, &torrent_path);
 			char* torrent_file = basename(torrent_path);
-
+			
 			if(report_to_tracker(torrent_file)){
 				printf("트래커 서버로 보고 완료\n");
 			}else {
 				printf("트래커 서버로 보고 실패\n");
-			}
+			} 
 	} else if(strcmp(option, "down") == 0) { // down 명령어
 		meta meta;
 		if(bdecode(&meta, file_path)){

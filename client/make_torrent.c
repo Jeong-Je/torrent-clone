@@ -5,7 +5,7 @@
 
 #include "make_torrent.h"
 
-void create_torrent(char *file_path, char *tracker_url, char *torrent_path) {
+void create_torrent(char *file_path, char *torrent_path) {
         struct stat file_stat; // stat 구조체 선언
 
         if(stat(file_path, &file_stat) == -1){
@@ -24,8 +24,14 @@ void create_torrent(char *file_path, char *tracker_url, char *torrent_path) {
         bencode_dict_start(fp);
 
         // announce (tracker URL);
+        char* server_ip = get_env("SERVER_IP");
+        char* server_port= get_env("SERVER_PORT");
+
+        char announce[100];
+        snprintf(announce, sizeof(announce), "%s:%s", server_ip, server_port);
+
         bencode_string(fp, "announce");
-        bencode_string(fp, tracker_url);
+        bencode_string(fp, announce);
 
         // info 딕셔너리 시작
         bencode_dict_start(fp);
