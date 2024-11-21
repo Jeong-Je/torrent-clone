@@ -4,10 +4,10 @@
 
 // key에 해당하는 value를 반환하는 함수
 char* get_env(char* key) {
-    FILE *file = fopen(".config", "r");
+    FILE *file = fopen(".env", "r");
 
     if (file == NULL) {
-        perror("config 파일 열기 실패");
+        perror("env 파일 열기 실패");
         return NULL; 
     }
 
