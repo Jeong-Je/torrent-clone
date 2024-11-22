@@ -104,8 +104,3 @@ void send_pieces() {
 
     close(server_fd);
 }
-
-int main() {
-    send_pieces();
-    return 0;
-}
