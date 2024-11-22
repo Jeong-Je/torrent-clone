@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "env.h"
 
 #define PORT 8080
 #define CHUNK_SIZE 131072 // 128KB
@@ -19,6 +20,13 @@ typedef struct {
 
 void send_pieces() {
     printf("서버 리스닝 상태로 대기 중...\n");
+
+    char* port = get_env("SERVER_PORT");
+    char* header_size_str = get_env("PIECE_HEADER_SIZE");
+    char* piece_size_str = get_env("PIECE_LENGTH");
+
+    int header_size = atoi(header_size_str); // char -> int 
+    int piece_size = atoi(piece_size_str); // char -> int
 
     int server_fd, client_socket;
     struct sockaddr_in server_addr, client_addr;
@@ -75,17 +83,17 @@ void send_pieces() {
             continue;
         }
 
-        char buffer[CHUNK_SIZE + HEADER_SIZE];
+        char buffer[piece_size + header_size];
         ssize_t bytes_read;
         int64_t chunk_index = 0;
 
         // 파일 조각 전송
-        while ((bytes_read = read(file_fd, buffer + HEADER_SIZE, CHUNK_SIZE)) > 0) {
+        while ((bytes_read = read(file_fd, buffer + header_size, piece_size)) > 0) {
             if (chunk_index >= request.start_chunk && chunk_index <= request.end_chunk) {
                 memcpy(buffer, &chunk_index, sizeof(chunk_index));                  // 인덱스
                 memcpy(buffer + sizeof(chunk_index), &bytes_read, sizeof(bytes_read)); // 크기
 
-                if (send(client_socket, buffer, HEADER_SIZE + bytes_read, 0) < 0) {
+                if (send(client_socket, buffer, header_size + bytes_read, 0) < 0) {
                     perror("조각 전송 실패");
                     close(file_fd);
                     close(client_socket);
