@@ -9,8 +9,19 @@
 #include "allocate_storage.h"
 #include "download_piece.h"
 #include "report_to_tracker.h"
+#include "send_pieces.h"
 
 int main(int argc, char *argv[]) {
+ 	if (argc == 1) {
+        // Default behavior when no arguments are provided
+        printf("torrent client program manual\n");
+        printf(".torrent 생성: %s make <파일 경로>\n", argv[0]);
+        printf(".torrent 다운: %s down <파일 경로>\n", argv[0]);
+
+		send_pieces();
+
+        return 0;
+    }
     if (argc == 3) {
 	char *option = argv[1]; 
     char *file_path = argv[2];
