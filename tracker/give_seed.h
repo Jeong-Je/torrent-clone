@@ -9,6 +9,6 @@
 
 #define MAX_SEEDS 5
 
-void* give_seed(void* arg);
+void* give_seed(void* data);
 
 #endif

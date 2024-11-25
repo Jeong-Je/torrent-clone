@@ -1,5 +1,6 @@
 #include "update_seedlist.h"
 #include "request.h"
+#include "is_seed.h"
 
 void *update_seedlist(void *data){
 	Request * req = (Request *)data;
@@ -24,11 +25,18 @@ void *update_seedlist(void *data){
 		return NULL;
 	}
 
-	// 파일에 클라 ip 기록
-	fprintf(file, "%s\n", req->client_ip);
+	if(is_seed(req, file_path)){	// 이미 시드로 존재하는 경우
+
+		printf("이미 시드입니다.\n");
+	} else{	// 아직 아닌경우
+
+		// 파일에 클라 ip 기록
+		fprintf(file, "%s\n", req->client_ip);
+		printf("시드리스트가 갱신되었습니다.\n");
+	}
 
 	fclose(file);
+	free(req);
 
 	return NULL;
-	
 }
