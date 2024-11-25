@@ -57,7 +57,7 @@ void* give_seed(void* data){
 	char* seeds[MAX_SEEDS];			// 클라이언트에게 줄 시드들
 	FILE* file; 					// 시드 리스트 관리할 파일 포인터
 
-	snprintf(file_path, sizeof(file_path), "./seed_List/%s", file_name);
+	snprintf(file_path, sizeof(file_path), "./seed_List/%s", file_name); 
 	
 	file = fopen(file_path, "rb");
 	if(file == NULL){

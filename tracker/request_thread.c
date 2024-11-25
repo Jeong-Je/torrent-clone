@@ -46,6 +46,7 @@ void* request_thread(void* data){
 
 		pthread_create(&tid, NULL, update_seedlist, (void *)req);
 		//pthread_join(tid, NULL);
+		pthread_detach(tid);
 
 	} else if(strcmp(msg, "give_seed") == 0) {
 
@@ -56,6 +57,7 @@ void* request_thread(void* data){
 
 		pthread_create(&tid, NULL, give_seed, (void*)file_name);	// 스레드로 give_seed 함수 호출 / 인자는 (.torrent 파일 이름)
 		//pthread_join(tid, NULL);
+		pthread_detach(tid);
 
 	} else{
 

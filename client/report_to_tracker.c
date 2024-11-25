@@ -17,7 +17,6 @@ bool report_to_tracker(char * torrent_file){
 
     char* server_ip = get_env("SERVER_IP");
 
-
     int sd;
     char buffer[256];
 

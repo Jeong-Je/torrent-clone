@@ -26,8 +26,12 @@ int main(int argc, char *argv[]) {
 			}else {
 				printf("트래커 서버로 보고 실패\n");
 			} 
-	} else if(strcmp(option, "down") == 0) { // down 명령어
+
+	} 
+	
+	else if(strcmp(option, "down") == 0) { // down 명령어
 		meta meta;
+
 		if(bdecode(&meta, file_path)){
 			printf("announce = %s\n", meta.announce);
 			printf("file_name = %s\n", meta.name);
@@ -35,14 +39,17 @@ int main(int argc, char *argv[]) {
 			printf("piece_length = %d\n", meta.piece_length);
 			printf("piece_num = %d\n", meta.piece_num);
 			printf("메타데이터 파싱 완료.\n");
+
 		} else {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
+
 		char temp_file_name[256];
 		allocate_storage(meta, temp_file_name);
 		printf("temp file name: %s\n", temp_file_name);
 		char* piece_map = (char*)malloc(sizeof(char) * meta.piece_num);
 		memset(piece_map, 0, sizeof(char)*meta.piece_num);
+
 		for (int i=0; i<meta.piece_num; i++){
 			if (piece_map[i] == 0){
 			download_piece(meta, temp_file_name);
@@ -50,24 +57,28 @@ int main(int argc, char *argv[]) {
 			}
 		}
 
-		
 		if (rename(temp_file_name, meta.name) == 0) {
-        printf("파일 이름이 성공적으로 변경되었습니다.");
+        	printf("파일 이름이 성공적으로 변경되었습니다.");
+	
 		} else {
 			perror("파일 이름 변경 실패");
 			exit(1);
 		}
 
-	} else {
+	} 
+	
+	else {
 		fprintf(stderr, "인자 오류\n");
 		return 1;
 	}
-    } else {
-	printf("torrent client program manual\n");
+
+    else {
+		printf("torrent client program manual\n");
         printf(".torrent 생성: %s make <파일 경로>\n", argv[0]);
-	printf(".torrent 다운: %s down <파일 경로>\n", argv[0]);
+		printf(".torrent 다운: %s down <파일 경로>\n", argv[0]);
         return 0;
     }
+	
     return 0;
 }
 
