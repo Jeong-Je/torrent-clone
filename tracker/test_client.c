@@ -3,8 +3,9 @@
 #include<arpa/inet.h>
 #include<sys/un.h>
 #include<unistd.h>
+#include<pthread.h>
 
-#define PORTNUM 12344
+#define PORTNUM 12343
 
 int main(){
 
@@ -28,21 +29,12 @@ int main(){
 
 	printf("connect success\n");
 
-	char buf[256];
+	char buf[512];
 	
-	printf("command : ");
+	printf("please input command:fileId ex) iam_seed:12345\n input->");
 	scanf("%s", buf);
 
 	if(send(client_socket, buf, strlen(buf), 0) == -1){
-	
-		perror("send err"); exit(1);
-	}
-
-	char file_id[256];
-	printf("file id : ");
-	scanf("%s", file_id);
-
-	if(send(client_socket, file_id, strlen(file_id), 0) == -1){
 	
 		perror("send err"); exit(1);
 	}

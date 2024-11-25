@@ -1,14 +1,10 @@
 #include "update_seedlist.h"
-
-typedef struct { // 클라 요청에서 filename과 client_ip를 담을 구조체
-	char file_name[100];
-	char client_ip[16];
-} Request;
+#include "request.h"
 
 void *update_seedlist(void *data){
 	Request * req = (Request *)data;
 
-    //printf("파일명 = %s, 클라이언트 IP = %s\n", req->file_name, req->client_ip);
+    printf("파일명 = %s, 클라이언트 IP = %s\n", req->file_name, req->client_ip);
 
 	FILE *file; // 시드 리스트 관리할 파일 포인터
 
@@ -19,7 +15,7 @@ void *update_seedlist(void *data){
 	}
 
 	// 파일 경로 생성
-	char file_path[100];
+	char file_path[1024];
 	snprintf(file_path, sizeof(file_path), "./seed_List/%s", req->file_name);
 	file = fopen(file_path, "ab"); // 파일 열자 ! 없으면 만들어~
 
