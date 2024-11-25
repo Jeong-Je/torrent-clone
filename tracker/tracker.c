@@ -73,6 +73,7 @@ int main(){
 		}	// 클라이언트 요청을 스레드생성해서 처리
 
 		//pthread_join(tid, NULL);
+		pthread_detach(tid);
 	}
 
 	close(server_socket);
