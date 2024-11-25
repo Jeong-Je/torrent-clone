@@ -28,7 +28,8 @@ void* request_thread(void* data){
 
 	char *msg = strtok(buf, ":"); // ":" 문자를 기준으로 앞 문자열 (command)
 	if(strcmp(msg, "iam_seed") == 0) {
-		printf("iam_seed 요청 수신\n");
+
+		printf("iam_seed 요청 수신\n");	//test
 
 		msg = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열  (.torrent 파일 이름)
 
@@ -40,19 +41,28 @@ void* request_thread(void* data){
 		req->file_name[sizeof(req->file_name) - 1] = '\0';
 		req->client_ip[sizeof(req->client_ip) - 1] = '\0';
 
-		printf("file_name: %s\n", req->file_name);
-		printf("client_ip: %s\n", req->client_ip);
+		//printf("file_name: %s\n", req->file_name);
+		//printf("client_ip: %s\n", req->client_ip);
 
 		pthread_create(&tid, NULL, update_seedlist, (void *)req);
+		//pthread_join(tid, NULL);
+
 	} else if(strcmp(msg, "give_seed") == 0) {
+
 		printf("give_seed 요청 수신\n");	// test
 
 		char* file_name = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열 (.torrent 파일 이름)
+		printf("file_name : %s\n", file_name); //test
 
 		pthread_create(&tid, NULL, give_seed, (void*)file_name);	// 스레드로 give_seed 함수 호출 / 인자는 (.torrent 파일 이름)
+		//pthread_join(tid, NULL);
+
+	} else{
+
+		printf("입력 형식을 확인해주세요.\n");
 	}
 
-	free(req); // 구조체 메모리 반환
+	//close(arg1->new_socket);
 
     return NULL;
 }

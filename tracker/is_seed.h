@@ -5,9 +5,10 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
+#include "request.h"
 
 #define MAX_LEN_LENGTH 1024
 
-bool is_seed(const char* file_id, const char* client_ip);
+bool is_seed(Request* req, const char* file_path);
 
 #endif

@@ -1,23 +1,20 @@
 #include "is_seed.h"
+#include "request.h"
 
-bool is_seed(const char* file_id, const char* client_ip){
+bool is_seed(Request* req, const char* file_path){
 
 	char line[MAX_LEN_LENGTH];
 
-	FILE* seedlist = fopen("seedlist.txt", "r");
+	FILE* seedlist = fopen(file_path, "rb");	// 시드 리스트 파일 열기
 	
-	while(fgets(line, sizeof(line), seedlist)){
-	
-		if(strstr(line, client_ip) != NULL){
+	while(fgets(line, sizeof(line), seedlist)){	// 한줄씩 읽기
 		
-			char* token = strtok(line, ":");
-			if(strcmp(token, file_id) == 0){
-			
-				return true;
-			}
+		strtok(line, "\n");
+		if(strcmp(line, req->client_ip) == 0){			// 이미 시드가 존재하면 true
+
+			return true;
 		}
 	}
 
 	return false;
 }
-// 변경 필요
