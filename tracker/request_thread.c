@@ -1,0 +1,58 @@
+#include <sys/socket.h>  // recv 함수 정의
+#include <arpa/inet.h>   // sockaddr_in, htons 등
+#include <unistd.h>      // close()
+
+#include "request_thread.h"
+#include "update_seedlist.h"
+#include "give_seed.h"
+#include "request.h"
+
+typedef struct { 	// request_thread 함수로 넘길 인자 
+	struct sockaddr_in client_address;
+	int new_socket;
+} Arg;
+
+void* request_thread(void* data){
+
+	char buf[512];
+    pthread_t tid;
+    Arg* arg1 = (Arg*)data;
+
+	if(recv(arg1->new_socket, buf, sizeof(buf), 0) == -1) {
+		perror("recv");
+		free(&arg1->new_socket);
+		exit(1);
+	}
+
+	Request *req = malloc(sizeof(Request)); // file_name과 클라이언트 ip를 담을 구조체
+
+	char *msg = strtok(buf, ":"); // ":" 문자를 기준으로 앞 문자열 (command)
+	if(strcmp(msg, "iam_seed") == 0) {
+		printf("iam_seed 요청 수신\n");
+
+		msg = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열  (.torrent 파일 이름)
+
+		// 문자열 복사
+		strncpy(req->file_name, msg, sizeof(req->file_name) - 1);
+		strncpy(req->client_ip, inet_ntoa(arg1->client_address.sin_addr), sizeof(req->client_ip) -1);
+
+		// 널 종료 문자 추가
+		req->file_name[sizeof(req->file_name) - 1] = '\0';
+		req->client_ip[sizeof(req->client_ip) - 1] = '\0';
+
+		printf("file_name: %s\n", req->file_name);
+		printf("client_ip: %s\n", req->client_ip);
+
+		pthread_create(&tid, NULL, update_seedlist, (void *)req);
+	} else if(strcmp(msg, "give_seed") == 0) {
+		printf("give_seed 요청 수신\n");	// test
+
+		char* file_name = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열 (.torrent 파일 이름)
+
+		pthread_create(&tid, NULL, give_seed, (void*)file_name);	// 스레드로 give_seed 함수 호출 / 인자는 (.torrent 파일 이름)
+	}
+
+	free(req); // 구조체 메모리 반환
+
+    return NULL;
+}

@@ -5,7 +5,10 @@
 #include<string.h>
 #include<stdbool.h>
 #include<stdlib.h>
+#include<time.h>
 
-int give_seed(const char* file_id);
+#define MAX_SEEDS 5
+
+void* give_seed(void* arg);
 
 #endif

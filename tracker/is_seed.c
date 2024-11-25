@@ -20,3 +20,4 @@ bool is_seed(const char* file_id, const char* client_ip){
 
 	return false;
 }
+// 변경 필요
