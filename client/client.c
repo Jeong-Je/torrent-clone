@@ -3,12 +3,13 @@
 #include <string.h>
 #include <libgen.h> // basename 함수를 위해서 추가
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
+#include "receive_piece.h"
 #include "make_torrent.h"
 #include "bdecode.h"
 #include "meta.h"
 #include "allocate_storage.h"
-#include "download_piece.h"
 #include "report_to_tracker.h"
 #include "send_pieces.h"
 
@@ -30,7 +31,7 @@ int main(int argc, char *argv[]) {
 
 	// make 명령어
 	if(strcmp(option, "make") == 0) {
-        	create_torrent(file_path, &torrent_path);
+        	create_torrent(file_path, torrent_path);
 			char* torrent_file = basename(torrent_path);
 			
 			if(report_to_tracker(torrent_file)){
