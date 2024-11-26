@@ -11,7 +11,7 @@
 
 #include "request_thread.h"
 
-#define PORTNUM 12343
+#define PORTNUM 32132
 #define CLIENT_MAX  10
 
 typedef struct { 	// request_thread 함수로 넘길 인자 

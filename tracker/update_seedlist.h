@@ -6,7 +6,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <errno.h>
+#include "request.h"
 
-void *update_seedlist(void *data);
+void update_seedlist(Request *req);
 
 #endif

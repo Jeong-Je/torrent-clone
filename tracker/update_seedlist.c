@@ -1,10 +1,7 @@
 #include "update_seedlist.h"
-#include "request.h"
 #include "is_seed.h"
 
-void *update_seedlist(void *data){
-	Request * req = (Request *)data;
-
+void update_seedlist(Request *req){
     printf("파일명 = %s, 클라이언트 IP = %s\n", req->file_name, req->client_ip);
 
 	FILE *file; // 시드 리스트 관리할 파일 포인터
@@ -12,7 +9,7 @@ void *update_seedlist(void *data){
 	// 피어 리스트를 관리하는 seed_List 폴더가 없을 경우 새로 생성함
 	if(mkdir("./seed_List", 0755) == -1 && errno != EEXIST) {
 		perror("디렉터리 생성 실패");
-		return NULL;
+		exit(1);
 	}
 
 	// 파일 경로 생성
@@ -22,7 +19,7 @@ void *update_seedlist(void *data){
 
 	if(file == NULL){
 		perror("파일 열기 실패");
-		return NULL;
+		exit(1);
 	}
 
 	if(is_seed(req, file_path)){	// 이미 시드로 존재하는 경우
@@ -36,7 +33,4 @@ void *update_seedlist(void *data){
 	}
 
 	fclose(file);
-	free(req);
-
-	return NULL;
 }

@@ -44,9 +44,7 @@ void* request_thread(void* data){
 		//printf("file_name: %s\n", req->file_name);
 		//printf("client_ip: %s\n", req->client_ip);
 
-		pthread_create(&tid, NULL, update_seedlist, (void *)req);
-		//pthread_join(tid, NULL);
-		pthread_detach(tid);
+		update_seedlist(req);
 
 	} else if(strcmp(msg, "give_seed") == 0) {
 
