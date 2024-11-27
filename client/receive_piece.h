@@ -5,5 +5,14 @@
 #include <netinet/in.h>
 #include "meta.h"
 
-void receive_piece(meta meta, int start_index, int end_index, in_addr_t seed_IP, char* temp_file_name);
+// 다운로드 요청 스레드 매개 변수
+typedef struct {
+    meta meta_data;
+    int start_index;
+    int end_index;
+    in_addr_t seed_IP;
+    char temp_file_name[256];
+} thread_args;
+
+void* receive_piece(void* vargs);
 #endif 

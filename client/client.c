@@ -3,6 +3,8 @@
 #include <string.h>
 #include <libgen.h> // basename 함수를 위해서 추가
 #include <netinet/in.h>
+#include <pthread.h>
+#include <sys/types.h>
 #include <arpa/inet.h>
 
 #include "receive_piece.h"
@@ -12,7 +14,9 @@
 #include "allocate_storage.h"
 #include "report_to_tracker.h"
 #include "send_pieces.h"
+#include "receive_piece.h"
 #include "request_tracker.h"
+
 int main(int argc, char *argv[]) {
  	if (argc == 1) {
         // Default behavior when no arguments are provided
@@ -52,7 +56,7 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
 
-		request_tracker(meta.announce, meta.name); // 트래커 서버로 피어 주라고 요청하기
+		// request_tracker(meta.announce, meta.name); // 트래커 서버로 피어 주라고 요청하기
 
 		// 트래커로부터 피어의수(1) + 피어의 IP(127.0.0.1)를 받음(일단 하드코딩)
 		int peer_num = 1;
@@ -73,6 +77,13 @@ int main(int argc, char *argv[]) {
 		char temp_file_name[256];
 		allocate_storage(meta, temp_file_name);
 
+		// 스레드 함수의 매개 변수
+		pthread_t threads[peer_num];
+		thread_args args;
+		args.meta_data = meta;
+		args.seed_IP = seed_IP;
+		strcpy(args.temp_file_name, temp_file_name);
+
 		// 설정한 인덱스에 따라 다운로드 요청
 		for (int i=0; i<peer_num; i++){
 			end_index = start_index + index_term -1;
@@ -84,10 +95,20 @@ int main(int argc, char *argv[]) {
         		end_index = meta.piece_num - 1;
    			}
 
-			// thread로 수정 필요
-			receive_piece(meta, start_index, end_index, seed_IP, temp_file_name);
+			args.start_index = start_index;
+			args.end_index = end_index;
 
-			start_index = end_index+1;
+			// 스레드 생성
+			if (pthread_create(&threads[i], NULL, receive_piece, (void*)&args) != 0) {
+				perror("pthread_create");
+				exit(1);
+			}
+
+			start_index = end_index++;
+		}
+
+		for (int i = 0; i < peer_num; i++) {
+			pthread_join(threads[i], NULL);
 		}
 
 		// 다운로드 완료시 원래 파일 이름으로 변경

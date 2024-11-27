@@ -8,6 +8,7 @@
 #include <string.h>
 #include "env.h"
 #include "meta.h"
+#include "receive_piece.h"
 
 // 피스 파일 요청 구조체
 typedef struct {
@@ -16,7 +17,19 @@ typedef struct {
     int64_t end_chunk;
 } file_request;
 
-void receive_piece(meta meta, int start_index, int end_index, in_addr_t seed_IP, char* temp_file_name){
+
+void* receive_piece(void* vargs){
+        printf("receive_piece 실행\n");
+        // 스레드 매개변수 할당
+        thread_args* args = (thread_args*)vargs;
+        meta meta_data = args->meta_data;
+        int start_index = args->start_index;
+        int end_index = args->end_index;
+        in_addr_t seed_IP = args->seed_IP;
+        char temp_file_name[256];
+        strcpy(temp_file_name, args->temp_file_name);
+
+        // 파일 수신할 버퍼 및 변수
         int sd;
         int header_size = atoi(get_env("PIECE_HEADER_SIZE"));
         int payload_size = atoi(get_env("PIECE_LENGTH"));
@@ -25,12 +38,13 @@ void receive_piece(meta meta, int start_index, int end_index, in_addr_t seed_IP,
         int64_t received_piece_index;
         int64_t received_piece_size;
         
-
+        // 피스 파일 요청 구조체
         file_request req;
-        strcpy(req.filename, meta.name);
+        strcpy(req.filename, meta_data.name);
         req.start_chunk = start_index;
         req.end_chunk = end_index;
 
+        // tcp 통신
         char* server_port = get_env("SERVER_PORT");
         int port = atoi(server_port);
         free(server_port);
@@ -81,11 +95,14 @@ void receive_piece(meta meta, int start_index, int end_index, in_addr_t seed_IP,
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
-                lseek(fd, start_index * meta.piece_length, SEEK_SET);
+                lseek(fd, start_index * meta_data.piece_length, SEEK_SET);
                 write(fd, payload_buf, received_piece_size);
                 printf("피스 배치 완료\n");
         }
 
         close(sd);
+        close(fd);
 
+        
+        pthread_exit(1);
 }
