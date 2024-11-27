@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 
+#include <sys/time.h> // gettimeofday 시간 측정을 위해서 추가
+
 #include "receive_piece.h"
 #include "make_torrent.h"
 #include "bdecode.h"
@@ -44,6 +46,9 @@ int main(int argc, char *argv[]) {
 				printf("트래커 서버로 보고 실패\n");
 			} 
 	} else if(strcmp(option, "down") == 0) { // down 명령어
+		struct timeval start, end; // 시간 변수
+		gettimeofday(&start, NULL); // 시작 시간
+
 		meta meta;
 		if(bdecode(&meta, file_path)){
 			printf("announce = %s\n", meta.announce);
@@ -118,6 +123,12 @@ int main(int argc, char *argv[]) {
 			perror("파일 이름 변경 실패");
 			exit(1);
 		}
+
+		gettimeofday(&end, NULL);
+
+		double diffTime = (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) / 1000000.0);
+
+		printf("다운로드 소요 시간 : %f sec", diffTime);
 
 
 	} else {
