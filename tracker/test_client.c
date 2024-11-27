@@ -5,7 +5,7 @@
 #include<unistd.h>
 #include<pthread.h>
 
-#define PORTNUM 12343
+#define PORTNUM 32132
 
 int main(){
 

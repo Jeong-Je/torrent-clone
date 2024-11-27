@@ -9,10 +9,8 @@
 
 #include <pthread.h>
 
+#include "env.h"
 #include "request_thread.h"
-
-#define PORTNUM 12343
-#define CLIENT_MAX  10
 
 typedef struct { 	// request_thread 함수로 넘길 인자 
 	struct sockaddr_in client_address;
@@ -34,9 +32,16 @@ int main(){
 		exit(1);
 	}
 
+	// .env파일에서 가져오기
+	char* tracker_ip = get_env("INIT_TRACKER_IP");
+	char* temp1 = get_env("SERVER_PORT");
+	char* temp2 = get_env("MAX_CLIENT");
+	int portnum = atoi(temp1);
+	int max_client = atoi(temp2);
+
 	server_address.sin_family = AF_INET;
-	server_address.sin_port = htons(PORTNUM);
-	server_address.sin_addr.s_addr = inet_addr("0.0.0.0");
+	server_address.sin_port = htons(portnum);
+	server_address.sin_addr.s_addr = inet_addr(tracker_ip);
 
 	// 바인딩
 	if(bind(server_socket, (struct sockaddr*)&server_address, sizeof(server_address))) {
@@ -46,7 +51,7 @@ int main(){
 	}
 
 	//listen
-	if(listen(server_socket, CLIENT_MAX) < 0){
+	if(listen(server_socket, max_client) < 0){
         perror("listen err");
         close(server_socket);
         exit(1);
