@@ -1,6 +1,6 @@
 #ifndef REQUEST_TRACKER_H
 #define REQUEST_TRACKER_H
 
-void request_tracker(char *announce, char *file_name);
+char* request_tracker(char *announce, char *file_name, int* peer_num);
 
 #endif
