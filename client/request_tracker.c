@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 
-void request_tracker(char *announce, char *file_name){
+char* request_tracker(char *announce, char *file_name, int* peer_num){
     char *ip = strtok(announce, ":"); // ":" 문자를 기준으로 앞 문자열 (ip 주소)
     char *port = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열 (port 번호)
 
@@ -44,7 +44,32 @@ void request_tracker(char *announce, char *file_name){
         exit(1);
     }
 
-    printf("recv buffer: %s", buffer);
+    printf("buffer: %s\n", buffer);
+
+    char* peer_num_buf = strtok(buffer, "@");
+    *peer_num = atoi(peer_num_buf);
+
+    char** ip_arr = (char**)malloc(sizeof(char*) * (*peer_num));
+    for (int i=0; i<*peer_num; i++){
+        ip_arr[i] = NULL;
+    }
+
+    char* ptr = strtok(NULL, ",");
+    int i = 0;
+    while (ptr != NULL){
+        ip_arr[i] = ptr;
+        ptr = strtok(NULL, ",");
+        i++;
+    }
+
+    printf("peernum: %d\n", *peer_num);
+    for (int i=0; i<5; i++){
+        if(ip_arr[i] == NULL) break;
+           
+        printf("ptr: %s\n", ip_arr[i]);
+    }
 
     close(sd);
+    printf("End\n");
+    return ip_arr;
 }

@@ -61,15 +61,17 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
 
-		request_tracker(meta.announce, meta.name); // 트래커 서버로 피어 주라고 요청하기
-
-		// 트래커로부터 피어의수(1) + 피어의 IP(127.0.0.1)를 받음(일단 하드코딩)
 		int peer_num = 1;
+		
+		// in_addr_t seed_IP;
+		char** seed_IP_arr;
+
+		seed_IP_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
+		
 		if (peer_num == 0){
 			perror("다운받을 수 없습니다.");
 			exit(1);
 		}
-		in_addr_t seed_IP = inet_addr("127.0.0.1");
 
 		// 분배할 조각의 수와 피어의 수에 따라 인덱스 나누기
 		int index_term = meta.piece_num / peer_num;
@@ -86,7 +88,7 @@ int main(int argc, char *argv[]) {
 		pthread_t threads[peer_num];
 		thread_args args;
 		args.meta_data = meta;
-		args.seed_IP = seed_IP;
+		// args.seed_IP = seed_IP;
 		strcpy(args.temp_file_name, temp_file_name);
 
 		// 설정한 인덱스에 따라 다운로드 요청
@@ -100,6 +102,7 @@ int main(int argc, char *argv[]) {
         		end_index = meta.piece_num - 1;
    			}
 
+			args.seed_IP = (in_addr_t)atoi(seed_IP_arr[i]);
 			args.start_index = start_index;
 			args.end_index = end_index;
 
