@@ -53,14 +53,13 @@ void create_torrent(char *file_path, char *torrent_path) {
 
         // piece_length (조각 크기)
         bencode_string(fp, "piece_length");
-        bencode_int(fp, atoi(piece_length));
+        bencode_int(fp, piece_length);
 	
 	// piece_num (조각의 개수)
 	int piece_num = (file_stat.st_size + piece_length - 1) / piece_length;
 	bencode_string(fp, "piece_num");
 	bencode_int(fp, piece_num);
 
-        free(piece_length);
 
         // info 딕셔너리 종료
         bencode_dict_end(fp);
