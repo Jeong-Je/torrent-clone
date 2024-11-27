@@ -25,9 +25,19 @@ void* receive_piece(void* vargs){
         meta meta_data = args->meta_data;
         int start_index = args->start_index;
         int end_index = args->end_index;
-        in_addr_t seed_IP = args->seed_IP;
+        char seed_IP[16];
+        strcpy(seed_IP, args->seed_IP);
         char temp_file_name[256];
         strcpy(temp_file_name, args->temp_file_name);
+        
+        printf("startindex: %d\n", start_index);
+        printf("endindex: %d\n", end_index);
+
+        // struct in_addr ip_addr;
+        // ip_addr.s_addr = seed_IP;  // in_addr 구조체에 복사
+
+        // printf("IP Address: %s\n", inet_ntoa(ip_addr));
+        
 
         // 파일 수신할 버퍼 및 변수
         int sd;
@@ -58,12 +68,15 @@ void* receive_piece(void* vargs){
         memset((char *)&sin, '\0', sizeof(sin));
         sin.sin_family = AF_INET;
         sin.sin_port = htons(port);
-        sin.sin_addr.s_addr = seed_IP;
+        printf("seed_IP: %s\n", seed_IP);       // test
+        sin.sin_addr.s_addr = inet_addr(seed_IP);
 
+        printf("connect 전\n");
         if (connect(sd, (struct sockaddr *)&sin, sizeof(sin))){
                 perror("connect");
                 exit(1);
         }
+        printf("connect 후\n");
 
         // 할당한 저장공간 열기
         int fd = open(temp_file_name, O_WRONLY, 0644);

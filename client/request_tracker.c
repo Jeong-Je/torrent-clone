@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 
-char* request_tracker(char *announce, char *file_name, int* peer_num){
+char** request_tracker(char *announce, char *file_name, int* peer_num){
     char *ip = strtok(announce, ":"); // ":" 문자를 기준으로 앞 문자열 (ip 주소)
     char *port = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열 (port 번호)
 
@@ -56,18 +56,32 @@ char* request_tracker(char *announce, char *file_name, int* peer_num){
 
     char* ptr = strtok(NULL, ",");
     int i = 0;
-    while (ptr != NULL){
-        ip_arr[i] = ptr;
+    while (ptr != NULL) {
+        // 문자열 크기 상수 정의
+        size_t max_len = 256;
+
+        // `ip_arr[i]`에 메모리 할당
+        ip_arr[i] = (char*)malloc(max_len);
+        if (ip_arr[i] == NULL) {
+            perror("malloc");
+            exit(1);
+        }
+        
+        // `ip_arr[i]`로 바로 복사
+        strncpy(ip_arr[i], ptr, max_len - 1);
+        ip_arr[i][max_len - 1] = '\0';  // NULL 종료 보장
+
         ptr = strtok(NULL, ",");
         i++;
     }
+
 
     printf("peernum: %d\n", *peer_num);
     for (int i=0; i<5; i++){
         if(ip_arr[i] == NULL) break;
            
         printf("ptr: %s\n", ip_arr[i]);
-    }
+    }   //test
 
     close(sd);
     printf("End\n");

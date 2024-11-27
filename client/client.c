@@ -65,9 +65,12 @@ int main(int argc, char *argv[]) {
 		
 		// in_addr_t seed_IP;
 		char** seed_IP_arr;
+		
 
 		seed_IP_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
 		
+		printf("seed_IP_arr: %s\n", seed_IP_arr[0]);
+
 		if (peer_num == 0){
 			perror("다운받을 수 없습니다.");
 			exit(1);
@@ -102,7 +105,8 @@ int main(int argc, char *argv[]) {
         		end_index = meta.piece_num - 1;
    			}
 
-			args.seed_IP = (in_addr_t)atoi(seed_IP_arr[i]);
+			strcpy(args.seed_IP, seed_IP_arr[i]);
+			//printf("seedIP(main): %s", args.seed_IP);
 			args.start_index = start_index;
 			args.end_index = end_index;
 

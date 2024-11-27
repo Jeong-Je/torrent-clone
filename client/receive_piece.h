@@ -10,7 +10,7 @@ typedef struct {
     meta meta_data;
     int start_index;
     int end_index;
-    in_addr_t seed_IP;
+    char seed_IP[16];
     char temp_file_name[256];
 } thread_args;
 
