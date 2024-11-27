@@ -27,6 +27,9 @@ void create_torrent(char *file_path, char *torrent_path) {
         char* server_ip = get_env("SERVER_IP");
         char* server_port= get_env("SERVER_PORT");
 
+        // piece_length
+        int piece_length = atoi(get_env("PIECE_LENGTH"));
+
         char announce[100];
         snprintf(announce, sizeof(announce), "%s:%s", server_ip, server_port);
         
@@ -50,12 +53,14 @@ void create_torrent(char *file_path, char *torrent_path) {
 
         // piece_length (조각 크기)
         bencode_string(fp, "piece_length");
-        bencode_int(fp, PIECE_LENGTH);
+        bencode_int(fp, atoi(piece_length));
 	
 	// piece_num (조각의 개수)
-	int piece_num = (file_stat.st_size + PIECE_LENGTH - 1) / PIECE_LENGTH;
+	int piece_num = (file_stat.st_size + piece_length - 1) / piece_length;
 	bencode_string(fp, "piece_num");
 	bencode_int(fp, piece_num);
+
+        free(piece_length);
 
         // info 딕셔너리 종료
         bencode_dict_end(fp);
