@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
 
-		// request_tracker(meta.announce, meta.name); // 트래커 서버로 피어 주라고 요청하기
+		request_tracker(meta.announce, meta.name); // 트래커 서버로 피어 주라고 요청하기
 
 		// 트래커로부터 피어의수(1) + 피어의 IP(127.0.0.1)를 받음(일단 하드코딩)
 		int peer_num = 1;

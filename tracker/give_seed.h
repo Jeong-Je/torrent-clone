@@ -9,6 +9,6 @@
 
 #define MAX_SEEDS 5
 
-int give_seed(char* file_name);
+int give_seed(char* file_name, int new_socket);
 
 #endif

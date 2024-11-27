@@ -40,5 +40,6 @@ int main(){
 		perror("send err"); exit(1);
 	}
 
+
 	close(client_socket);
 }

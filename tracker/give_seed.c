@@ -1,106 +1,138 @@
 #include "give_seed.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+#include <time.h>
 
-int give_random(char file_path[256], char* seeds[MAX_SEEDS], int seed_cnt){
+int give_random(char file_path[256], char* seeds[MAX_SEEDS], int seed_cnt) {
+    FILE* file;
+    char line[256];
+    int seeds_index = 0;
 
-	FILE* file;
-	char line[256];
-	int seeds_index = 0;
+    file = fopen(file_path, "rb");
+    if (file == NULL) {
+        perror("fopen err");
+        exit(1);
+    }
 
-	file = fopen(file_path, "rb");
-	if(file == NULL){
+    bool* gived_seed = malloc(sizeof(bool) * (seed_cnt + 1)); // 고정
+    if (gived_seed == NULL) {
+        perror("malloc failed");
+        exit(1);
+    }
 
-		perror("fopen err"); exit(1);
-	}
+    for (int i = 0; i <= seed_cnt; i++) {
+        gived_seed[i] = false;
+    }
 
-	bool* gived_seed = malloc(sizeof(bool) * seed_cnt + 1);		// 이미 준 시드 확인하는 배열
-	gived_seed[0] = true;
-	for(int i=1; i<seed_cnt + 1; i++) gived_seed[i] = false;
+    srand(time(0));
+    for (int i = 0; i < 5; i++) {
+        int random_value = rand() % seed_cnt + 1;
+        while (gived_seed[random_value]) {
+            random_value = rand() % seed_cnt + 1;
+        }
 
-	srand(time(0));
-	for(int i=0; i<5; i++){
+        int temp = 1;
+        while (temp < random_value && fgets(line, 256, file)) {
+            temp++;
+        }
 
-		int random_value = rand() % seed_cnt + 1;	// 1~seed_cnt 범위로 랜덤한 값 추출
-		while(gived_seed[random_value]){			// 안 뽑은 랜덤 값 추출
+        fgets(line, 256, file); // 랜덤한 줄 읽기
 
-			random_value = rand() % seed_cnt + 1;	
-		}
+        seeds[seeds_index] = malloc(256 * sizeof(char)); // 메모리 할당
+        if (seeds[seeds_index] == NULL) {
+            perror("malloc failed");
+            exit(1);
+        }
 
+		int len = strlen(line); line[len-1] = '\0';
+        strcpy(seeds[seeds_index], line);
 
-		int temp = 1;
-		while(temp < random_value && fgets(line, 256, file)){
+        gived_seed[random_value] = true;
+        memset(line, '\0', sizeof(line));
+        fseek(file, 0, SEEK_SET);
+        seeds_index++;
+    }
 
-			temp++;	// 랜덤한 줄으로 이동
-		}
-
-		fgets(line, 256, file);
-
-		seeds[seeds_index++] = line;				// 시드 선택
-		gived_seed[random_value] = true;			// 이미 준 시드 체크
-		printf("selected seed %d : %s", i, line);	// 시드 출력
-
-		memset(line, '\0', sizeof(line));	//line 비우기
-		fseek(file, 0, SEEK_SET);	// 파일 포인터 옮기기
-	}
-
-	return 0;
+    free(gived_seed);
+    fclose(file);
+    return seeds_index;
 }
 
-int give_seed(char* file_name){
+int give_seed(char* file_name, int new_socket) {
+    printf("give_seed 함수 호출\n");
 
-	printf("give_seed 함수 호출\n");
+    int seeds_index = 0;
+    char line[256];
+    char file_path[256];
+    char* seeds[MAX_SEEDS];
+    FILE* file;
 
-	//printf("filename:%s\n", file_name); //test
+    for (int i = 0; i < MAX_SEEDS; i++) {
+        seeds[i] = NULL;
+    }
 
-	char line[256]; 
-	char file_path[256];			// 시드리스트의 경로
-	char* seeds[MAX_SEEDS];			// 클라이언트에게 줄 시드들
-	FILE* file; 					// 시드 리스트 관리할 파일 포인터
+    snprintf(file_path, sizeof(file_path), "./seed_List/%s", file_name);
 
-	snprintf(file_path, sizeof(file_path), "./seed_List/%s", file_name);
-	
-	file = fopen(file_path, "rb");
-	if(file == NULL){
+    file = fopen(file_path, "rb");
+    if (file == NULL) {
+        printf("There is not seeds.\n");
+        return -1;
+    }
 
-		printf("There is not seeds.\n");
+    int seed_cnt = 0;
+    while (fgets(line, sizeof(line), file)) {
+        seed_cnt++;
+    }
+
+    printf("seed_cnt : %d\n", seed_cnt);
+
+    if (seed_cnt > 5) {
+        seeds_index = give_random(file_path, seeds, seed_cnt);
+    } else if (seed_cnt == 0) {
+        printf("There is not seeds.\n");
+    } else {
+        fseek(file, 0, SEEK_SET);
+        for (int i = 0; i < seed_cnt; i++) {
+            if (fgets(line, sizeof(line), file)) {
+                seeds[i] = malloc(256 * sizeof(char));
+                if (seeds[i] == NULL) {
+                    perror("malloc failed");
+                    exit(1);
+                }
+				
+				int len = strlen(line); line[len-1] = '\0';
+                strcpy(seeds[i], line);
+            }
+        }
+        seeds_index = seed_cnt;
+    }
+
+    char result[1024] = "";
+    for (int i = 0; i < seeds_index; i++) {
+        printf("seeds %d : %s\n", i, seeds[i]);
+        if (i == 0) {
+            snprintf(result, sizeof(result), "%s", seeds[i]);
+        } else {
+            char temp_result[1024];
+            snprintf(temp_result, sizeof(temp_result), "%s,%s", result, seeds[i]);
+            strncpy(result, temp_result, sizeof(result));
+        }
+    }
+
+    printf("result : %s\n", result);	//test
+
+	if(send(new_socket, result, strlen(result)+1, 0) == -1){
+
+		perror("send err"); exit(1);
 	}
 
-	int seed_cnt = 0; 	//시드 개수
-	while(fgets(line, sizeof(line), file)){		//시드 개수 세기
+    fclose(file);
 
-		//printf("line : %s", line);	//test
-		seed_cnt++;
-	}
+    for (int i = 0; i < MAX_SEEDS; i++) {
+        free(seeds[i]); // 메모리 해제
+    }
 
-	printf("seed_cnt : %d\n", seed_cnt);	//test
-
-	if(seed_cnt > 5){
-
-		give_random(file_path, seeds, seed_cnt);	// 랜덤 시드
-		//순회 시드 추후 구현필요
-	} else if(seed_cnt == 0){
-
-		printf("There is not seeds.\n");
-	} else{
-		
-		int index = 0;
-		memset(line, '\0', sizeof(line));	//line 비우기
-		fseek(file, 0, SEEK_SET);	// 파일 포인터 옮기기
-
-		for(int i=0; i<seed_cnt; i++){
-
-			while(fgets(line, sizeof(line), file)){	// 시드개수가 0~5라면 그냥 주기
-
-				seeds[index++] = line;	// 시드 선택
-				printf("selected seed %d : %s", i, line); // 시드 출력
-			}
-		}
-	}
-
-	fclose(file);
-
-	return 0;
+    return 0;
 }
-
-// 현재로서는 시드 콘솔에 출력까지만 해놓음
-
-// 시드 선택해서 seeds 배열에 넣어놨고 해당 시드들을 클라이언트에게 어떻게 제공할지에 대한 코드 구현 필요

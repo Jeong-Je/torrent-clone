@@ -53,7 +53,7 @@ void* request_thread(void* data){
 		char* file_name = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열 (.torrent 파일 이름)
 		printf("file_name : %s\n", file_name); //test
 
-		give_seed(file_name);
+		give_seed(file_name, arg1->new_socket);
 
 	} else{
 

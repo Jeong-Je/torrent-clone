@@ -17,6 +17,7 @@ void request_tracker(char *announce, char *file_name){
     struct sockaddr_in sin;
 
     sprintf(buffer, "give_seed:%s.torrent", file_name);
+    printf("%s\n", buffer); ///test 
 
     memset((char *)&sin, '\0', sizeof(sin));
     sin.sin_family = AF_INET;
