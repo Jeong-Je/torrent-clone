@@ -1,9 +1,5 @@
 #include "give_seed.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdbool.h>
-#include <time.h>
+
 
 int give_random(char file_path[256], char* seeds[MAX_SEEDS], int seed_cnt) {
     FILE* file;
@@ -110,10 +106,11 @@ int give_seed(char* file_name, int new_socket) {
     }
 
     char result[1024] = "";
+    sprintf(result, "%d@", seeds_index); // 제일 처음 토큰은 피어의 수
     for (int i = 0; i < seeds_index; i++) {
         printf("seeds %d : %s\n", i, seeds[i]);
         if (i == 0) {
-            snprintf(result, sizeof(result), "%s", seeds[i]);
+            snprintf(result, sizeof(result), "%d@%s", seeds_index,seeds[i]);
         } else {
             char temp_result[1024];
             snprintf(temp_result, sizeof(temp_result), "%s,%s", result, seeds[i]);
