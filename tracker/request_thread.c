@@ -1,7 +1,3 @@
-#include <sys/socket.h>  // recv 함수 정의
-#include <arpa/inet.h>   // sockaddr_in, htons 등
-#include <unistd.h>      // close()
-
 #include "request_thread.h"
 #include "update_seedlist.h"
 #include "give_seed.h"
