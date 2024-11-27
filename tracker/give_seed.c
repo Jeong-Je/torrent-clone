@@ -45,11 +45,10 @@ int give_random(char file_path[256], char* seeds[MAX_SEEDS], int seed_cnt){
 	return 0;
 }
 
-void* give_seed(void* data){
+int give_seed(char* file_name){
 
 	printf("give_seed 함수 호출\n");
 
-	char* file_name = (char*) data;
 	//printf("filename:%s\n", file_name); //test
 
 	char line[256]; 

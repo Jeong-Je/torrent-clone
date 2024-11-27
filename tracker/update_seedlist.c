@@ -1,8 +1,8 @@
 #include "update_seedlist.h"
 #include "is_seed.h"
 
-void update_seedlist(Request *req){
-    printf("파일명 = %s, 클라이언트 IP = %s\n", req->file_name, req->client_ip);
+int update_seedlist(Request req){
+    printf("파일명 = %s, 클라이언트 IP = %s\n", req.file_name, req.client_ip);
 
 	FILE *file; // 시드 리스트 관리할 파일 포인터
 
@@ -14,7 +14,7 @@ void update_seedlist(Request *req){
 
 	// 파일 경로 생성
 	char file_path[1024];
-	snprintf(file_path, sizeof(file_path), "./seed_List/%s", req->file_name);
+	snprintf(file_path, sizeof(file_path), "./seed_List/%s", req.file_name);
 	file = fopen(file_path, "ab"); // 파일 열자 ! 없으면 만들어~
 
 	if(file == NULL){
@@ -28,9 +28,11 @@ void update_seedlist(Request *req){
 	} else{	// 아직 아닌경우
 
 		// 파일에 클라 ip 기록
-		fprintf(file, "%s\n", req->client_ip);
+		fprintf(file, "%s\n", req.client_ip);
 		printf("시드리스트가 갱신되었습니다.\n");
 	}
 
 	fclose(file);
+
+	return 0;
 }

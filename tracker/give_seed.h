@@ -9,6 +9,6 @@
 
 #define MAX_SEEDS 5
 
-void* give_seed(void* data);
+int give_seed(char* file_name);
 
 #endif

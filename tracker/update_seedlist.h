@@ -8,6 +8,6 @@
 #include <errno.h>
 #include "request.h"
 
-void update_seedlist(Request *req);
+int update_seedlist(Request req);
 
 #endif

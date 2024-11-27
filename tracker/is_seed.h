@@ -9,6 +9,6 @@
 
 #define MAX_LEN_LENGTH 1024
 
-bool is_seed(Request* req, const char* file_path);
+bool is_seed(Request req, const char* file_path);
 
 #endif
