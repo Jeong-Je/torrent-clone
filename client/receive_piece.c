@@ -23,7 +23,8 @@ void* receive_piece(void* vargs){
         int end_index = args->end_index;
         char seed_IP[16];
         strcpy(seed_IP, args->seed_IP);
-        char temp_file_name[256];
+        int seed_port = args->seed_port;
+        // char temp_file_name[256];
         // strcpy(temp_file_name, args->temp_file_name);
         int fd = args->fd;
         
@@ -46,9 +47,9 @@ void* receive_piece(void* vargs){
         req.end_chunk = end_index;
 
         // tcp 통신
-        char* server_port = get_env("SERVER_PORT");
-        int port = atoi(server_port);
-        free(server_port);
+        // char* server_port = get_env("SERVER_PORT");
+        int port = seed_port;// atoi(server_port);
+        // free(server_port);
         struct sockaddr_in sin;
 
         if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){

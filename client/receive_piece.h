@@ -11,7 +11,7 @@ typedef struct {
     int start_index;
     int end_index;
     char seed_IP[16];
-    // char temp_file_name[256];
+    int seed_port;
     int fd;
 } down_request_targs;
 

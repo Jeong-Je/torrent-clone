@@ -75,10 +75,17 @@ void* handle_client(void* varg) {
 void send_pieces() {
     
     printf("서버 리스닝 상태로 대기 중...\n");
+    
+    // port파일 열어서 포트 읽어오기
+    int fd = open("port.txt", O_RDONLY);
+    if (fd == -1) {
+        perror("Failed to open the file");
+        exit(1);
+    }
 
-    char* port_str = get_env("SERVER_PORT");
-    char* header_size_str = get_env("PIECE_HEADER_SIZE");
-
+    char port_str[10];
+    read(fd, port_str, 10);
+    printf("port_str: %s\n", port_str);
     int port = atoi(port_str);
 
     int server_fd;

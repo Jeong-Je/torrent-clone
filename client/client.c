@@ -64,11 +64,11 @@ int main(int argc, char *argv[]) {
 		}
 
 		int peer_num = 0;
-		char** seed_IP_arr;
-		seed_IP_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
+		char** seed_ip_port_arr;
+		seed_ip_port_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
 		
 		for (int i=0; i<peer_num; i++){
-			printf("seed_IP_arr[%d]: %s\n", i, seed_IP_arr[i]);
+			printf("seed_ip_port_arr[%d]: %s\n", i, seed_ip_port_arr[i]);
 		}
 		
 
@@ -132,8 +132,15 @@ int main(int argc, char *argv[]) {
 			if (end_index >= meta.piece_num) {
         		end_index = meta.piece_num - 1;
    			}
+			char seed_ip[16];
+			int seed_port;
+			sscanf(seed_ip_port_arr[i], "%15[^:]:%d", seed_ip, &seed_port);
+			printf("seed_ip: %s\n", seed_ip);
+			printf("seed_port: %d\n", seed_port);
 
-			strcpy(args[i].seed_IP, seed_IP_arr[i]);
+			strcpy(args[i].seed_IP, seed_ip);
+			//strcpy(args[i].seed_port, seed_port);
+			args[i].seed_port = seed_port;
 			//printf("seedIP(main): %s", args.seed_IP);
 			args[i].start_index = start_index;
 			args[i].end_index = end_index;

@@ -49,9 +49,9 @@ char** request_tracker(char *announce, char *file_name, int* peer_num){
     char* peer_num_buf = strtok(buffer, "@");
     *peer_num = atoi(peer_num_buf);
 
-    char** ip_arr = (char**)malloc(sizeof(char*) * (*peer_num));
+    char** ip_port_arr = (char**)malloc(sizeof(char*) * (*peer_num));
     for (int i=0; i<*peer_num; i++){
-        ip_arr[i] = NULL;
+        ip_port_arr[i] = NULL;
     }
 
     char* ptr = strtok(NULL, ",");
@@ -61,16 +61,17 @@ char** request_tracker(char *announce, char *file_name, int* peer_num){
         size_t max_len = 256;
 
         // `ip_arr[i]`에 메모리 할당
-        ip_arr[i] = (char*)malloc(max_len);
-        if (ip_arr[i] == NULL) {
+        ip_port_arr[i] = (char*)malloc(max_len);
+        if (ip_port_arr[i] == NULL) {
             perror("malloc");
             exit(1);
         }
         
-        // `ip_arr[i]`로 바로 복사
-        strncpy(ip_arr[i], ptr, max_len - 1);
-        ip_arr[i][max_len - 1] = '\0';  // NULL 종료 보장
+        // 'ip_port_arr로 바로 복사'
+        strncpy(ip_port_arr[i], ptr, max_len - 1);
+        ip_port_arr[i][max_len - 1] = '\0';  // NULL 종료 보장
 
+        // 다음 ip에 대해서 파싱
         ptr = strtok(NULL, ",");
         i++;
     }
@@ -78,12 +79,12 @@ char** request_tracker(char *announce, char *file_name, int* peer_num){
 
     printf("peernum: %d\n", *peer_num);
     for (int i=0; i<*peer_num; i++){
-        if(ip_arr[i] == NULL) break;
+        if(ip_port_arr[i] == NULL) break;
            
-        printf("ptr: %s\n", ip_arr[i]);
+        printf("ptr: %s\n", ip_port_arr[i]);
     }   //test
 
     close(sd);
     printf("End\n");
-    return ip_arr;
+    return ip_port_arr;
 }
