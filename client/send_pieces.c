@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <sys/time.h> // gettimeofday 시간 측정을 위해서 추가
 #include "env.h"
 #include "receive_piece.h"
 #include "meta.h"
@@ -67,6 +68,8 @@ void* handle_client(void* varg) {
 }
 
 void send_pieces() {
+    struct timeval start, end; // 시간 변수
+    gettimeofday(&start, NULL); // 시작 시간
     printf("서버 리스닝 상태로 대기 중...\n");
 
     char* port_str = get_env("SERVER_PORT");
@@ -151,4 +154,7 @@ void send_pieces() {
     }
 
     close(server_fd);
+    gettimeofday(&end, NULL);
+    double diffTime = (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) / 1000000.0);
+    printf("다운로드 소요 시간 : %f sec", diffTime);
 }
