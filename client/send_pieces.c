@@ -52,7 +52,7 @@ void* handle_client(void* varg) {
                 free(args); // 요청 메모리 해제
                 pthread_exit(NULL);
             }
-            printf("송신: 조각 %lld (%ld 바이트)\n", chunk_index, bytes_read);
+            // printf("송신: 조각 %lld (%ld 바이트)\n", chunk_index, bytes_read);
         }
         if (chunk_index > args->end_chunk) break;
         chunk_index++;

@@ -85,13 +85,15 @@ int main(int argc, char *argv[]) {
 
 		// 스레드 함수의 매개 변수
 		pthread_t threads[peer_num];
-		down_request_targs args;
-		args.meta_data = meta;
+		down_request_targs args[peer_num];
+		
 		// args.seed_IP = seed_IP;
-		strcpy(args.temp_file_name, temp_file_name);
+		
 
 		// 설정한 인덱스에 따라 다운로드 요청
 		for (int i=0; i<peer_num; i++){
+			args[i].meta_data = meta;
+			strcpy(args[i].temp_file_name, temp_file_name);
 			end_index = start_index + index_term -1;
 			if (i<addition_term){
 				end_index++;
@@ -101,10 +103,10 @@ int main(int argc, char *argv[]) {
         		end_index = meta.piece_num - 1;
    			}
 
-			strcpy(args.seed_IP, seed_IP_arr[i]);
+			strcpy(args[i].seed_IP, seed_IP_arr[i]);
 			//printf("seedIP(main): %s", args.seed_IP);
-			args.start_index = start_index;
-			args.end_index = end_index;
+			args[i].start_index = start_index;
+			args[i].end_index = end_index;
 
 			// 스레드 생성
 			if (pthread_create(&threads[i], NULL, receive_piece, (void*)&args) != 0) {
@@ -112,7 +114,7 @@ int main(int argc, char *argv[]) {
 				exit(1);
 			}
 
-			start_index = end_index++;
+			start_index = ++end_index;
 		}
 
 		for (int i = 0; i < peer_num; i++) {
