@@ -23,6 +23,8 @@ typedef struct {
 
 // 클라이언트 요청을 처리하는 함수
 void* handle_client(void* varg) {
+    struct timeval start, end; // 시간 변수
+    gettimeofday(&start, NULL); // 시작 시간
     thread_args* args = (thread_args*)varg;
 
     int header_size = atoi(get_env("PIECE_HEADER_SIZE"));
@@ -63,13 +65,15 @@ void* handle_client(void* varg) {
     close(file_fd);
     close(args->client_socket);
     printf("송신 완료: 조각 %lld~%lld\n", args->start_chunk, args->end_chunk);
+    gettimeofday(&end, NULL);
+    double diffTime = (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) / 1000000.0);
+    printf("송신 소요 시간 : %f sec", diffTime);
     free(args); // 요청 메모리 해제
     pthread_exit(NULL);
 }
 
 void send_pieces() {
-    struct timeval start, end; // 시간 변수
-    gettimeofday(&start, NULL); // 시작 시간
+    
     printf("서버 리스닝 상태로 대기 중...\n");
 
     char* port_str = get_env("SERVER_PORT");
@@ -154,7 +158,5 @@ void send_pieces() {
     }
 
     close(server_fd);
-    gettimeofday(&end, NULL);
-    double diffTime = (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) / 1000000.0);
-    printf("다운로드 소요 시간 : %f sec", diffTime);
+    
 }
