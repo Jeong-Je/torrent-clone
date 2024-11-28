@@ -101,12 +101,12 @@ void* receive_piece(void* vargs){
 
                 memcpy(&received_piece_index, header_buf, sizeof(received_piece_index));
                 memcpy(&received_piece_size, header_buf + sizeof(received_piece_index), sizeof(received_piece_size));
-                printf("piece index: %d\n", received_piece_index);
-                printf("piece size: %d\n", received_piece_size);
+                // printf("piece index: %d\n", received_piece_index);
+                // printf("piece size: %d\n", received_piece_size);
                 
                 // 피스 파일 수신
                 bytes_received = recv(sd, payload_buf, received_piece_size, MSG_WAITALL);
-                printf("received piece: %s\n", payload_buf);
+                // printf("received piece: %s\n", payload_buf);
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
