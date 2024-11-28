@@ -11,20 +11,6 @@
 #include "meta.h"
 #include "receive_piece.h"
 
-typedef struct {
-    int fd;
-    int piece_length;
-    char* piece;
-    int piece_size;
-    int i;
-} merge_piece_structs;
-
-void* merge_piece(void* vargs){
-        merge_piece_structs* args = (merge_piece_structs*)vargs;
-
-        lseek(args->fd, args->i * args->piece_length, SEEK_SET);
-        write(args->fd, args->piece, args->piece_size);
-}
 
 void* receive_piece(void* vargs){
         printf("receive_piece 실행\n");
@@ -36,7 +22,8 @@ void* receive_piece(void* vargs){
         char seed_IP[16];
         strcpy(seed_IP, args->seed_IP);
         char temp_file_name[256];
-        strcpy(temp_file_name, args->temp_file_name);
+        // strcpy(temp_file_name, args->temp_file_name);
+        int fd = args->fd;
         
         printf("startindex: %d\n", start_index);
         printf("endindex: %d\n", end_index);
@@ -81,11 +68,11 @@ void* receive_piece(void* vargs){
         printf("connect 후\n");
 
         // 할당한 저장공간 열기
-        int fd = open(temp_file_name, O_WRONLY, 0644);
-        if (fd == -1){
-                perror("임시 파일 열기 실패");
-                exit(1);
-        }
+        // int fd = open(temp_file_name, O_WRONLY, 0644);
+        // if (fd == -1){
+        //         perror("임시 파일 열기 실패");
+        //         exit(1);
+        // }
 
         // 피스 파일 요청 구조체 송신
         if (send(sd, &req, sizeof(req), 0) == -1){
@@ -110,21 +97,8 @@ void* receive_piece(void* vargs){
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
-                // 스레드 생성
-                pthread_t thread;
-                merge_piece_structs args;
-                args.fd = fd;
-                args.i = i;
-                strcpy(args.piece, payload_buf);
-                args.piece_length = meta_data.piece_length;
-                args.piece_size = received_piece_size;
-
-                if (pthread_create(&thread, NULL, merge_piece, (void*)&args) != 0) {
-                        perror("pthread_create");
-                        exit(1);
-                }
-                // lseek(fd, i * meta_data.piece_length, SEEK_SET);
-                // write(fd, payload_buf, received_piece_size);
+                lseek(fd, i * meta_data.piece_length, SEEK_SET);
+                write(fd, payload_buf, received_piece_size);
                 printf("피스 배치 완료\n");
         }
 

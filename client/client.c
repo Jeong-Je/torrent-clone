@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
 
 #include <sys/time.h> // gettimeofday 시간 측정을 위해서 추가
 
@@ -81,7 +82,13 @@ int main(int argc, char *argv[]) {
 		
 		// 저장공간 할당
 		char temp_file_name[256];
-		allocate_storage(meta, temp_file_name);
+		// allocate_storage(meta, temp_file_name);
+		
+    	int fd[peer_num];
+		for (int i=0; i<peer_num; i++){
+			sprintf(temp_file_name, "%s_temp_%d", meta.name, i);
+			fd[i] = open(temp_file_name, O_CREAT | O_RDWR, 0644);
+		}
 
 		// 스레드 함수의 매개 변수
 		pthread_t threads[peer_num];
@@ -93,7 +100,8 @@ int main(int argc, char *argv[]) {
 		// 설정한 인덱스에 따라 다운로드 요청
 		for (int i=0; i<peer_num; i++){
 			args[i].meta_data = meta;
-			strcpy(args[i].temp_file_name, temp_file_name);
+			//strcpy(args[i].temp_file_name, temp_file_name);
+			args->fd = fd[i];
 			end_index = start_index + index_term -1;
 			if (i<addition_term){
 				end_index++;
@@ -122,12 +130,32 @@ int main(int argc, char *argv[]) {
 		}
 
 		// 다운로드 완료시 원래 파일 이름으로 변경
-		if (rename(temp_file_name, meta.name) == 0) {
-        printf("파일 이름이 성공적으로 변경되었습니다.");
-		} else {
-			perror("파일 이름 변경 실패");
-			exit(1);
+		// if (rename(temp_file_name, meta.name) == 0) {
+        // printf("파일 이름이 성공적으로 변경되었습니다.");
+		// } else {
+		// 	perror("파일 이름 변경 실패");
+		// 	exit(1);
+		// }
+
+		int finalfd = open(meta.name, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+		char buf[4096]; // 버퍼 크기 확장
+		
+		for (int i = 0; i < peer_num; i++) {
+			int n;
+			while ((n = read(fd[i], buf, sizeof(buf))) > 0) {
+				if (write(finalfd, buf, n) != n) {
+					perror("Write error");
+					close(finalfd);
+					exit(EXIT_FAILURE);
+				}
+			}
+			if (n == -1) { // read 에러 처리
+				perror("Read error");
+				close(finalfd);
+				exit(EXIT_FAILURE);
+			}
 		}
+
 
 		gettimeofday(&end, NULL);
 

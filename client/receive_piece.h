@@ -11,7 +11,8 @@ typedef struct {
     int start_index;
     int end_index;
     char seed_IP[16];
-    char temp_file_name[256];
+    // char temp_file_name[256];
+    int fd;
 } down_request_targs;
 
 // 피스 파일 요청 구조체
