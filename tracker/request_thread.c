@@ -6,6 +6,7 @@
 typedef struct { 	// request_thread 함수로 넘길 인자 
 	struct sockaddr_in client_address;
 	int new_socket;
+	int base_port_num;
 } Arg;
 
 void* request_thread(void* data){
@@ -13,7 +14,7 @@ void* request_thread(void* data){
 	char buf[512];
     //pthread_t tid;
     Arg* arg1 = (Arg*)data;
-
+	printf("socket : %d\n", arg1->new_socket);
 	if(recv(arg1->new_socket, buf, sizeof(buf), 0) == -1) {
 		perror("recv");
 		//free(&arg1->new_socket);
@@ -23,8 +24,7 @@ void* request_thread(void* data){
 	Request req; // file_name과 클라이언트 ip를 담을 구조체
 
 	char *msg = strtok(buf, ":"); // ":" 문자를 기준으로 앞 문자열 (command)
-	if(strcmp(msg, "iam_seed") == 0) {
-
+	if(strcmp(msg, "iam_seed") == 0) {		
 		printf("iam_seed 요청 수신\n");	//test
 
 		msg = strtok(NULL, ":"); // ":" 문자를 기준으로 두 번째 문자열  (.torrent 파일 이름)
@@ -36,9 +36,8 @@ void* request_thread(void* data){
 		// 널 종료 문자 추가
 		req.file_name[sizeof(req.file_name) - 1] = '\0';
 		req.client_ip[sizeof(req.client_ip) - 1] = '\0';
-
-		//printf("file_name: %s\n", req.file_name);
-		//printf("client_ip: %s\n", req.client_ip);
+		req.port_num = arg1->base_port_num;
+		req.new_socket = arg1->new_socket;
 
 		update_seedlist(req);
 

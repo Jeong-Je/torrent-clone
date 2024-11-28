@@ -46,6 +46,19 @@ bool report_to_tracker(char * torrent_file){
         return false;
     }
 
+    int* new_port_num = malloc(sizeof(int));  // 메모리 할당
+    if(recv(sd, new_port_num, sizeof(new_port_num), 0) == -1) {
+        perror("recv");
+        return false;
+    }
+
+    printf("My Port Number is > %d\n", *new_port_num);
+
+    FILE* fp;
+    fp = fopen("port.txt", "ab");
+
+    fprintf(fp, "%d", *new_port_num);
+
     close(sd);
 
     return true;
