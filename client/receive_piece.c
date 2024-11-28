@@ -56,7 +56,7 @@ void* receive_piece(void* vargs){
         memset((char *)&sin, '\0', sizeof(sin));
         sin.sin_family = AF_INET;
         sin.sin_port = htons(port);
-        printf("seed_IP: %s\n", seed_IP);       // test
+        // printf("seed_IP: %s\n", seed_IP);       // test
         sin.sin_addr.s_addr = inet_addr(seed_IP);
 
         printf("connect 전\n");

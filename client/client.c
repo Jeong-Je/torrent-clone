@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 			args[i].end_index = end_index;
 
 			// 스레드 생성
-			if (pthread_create(&threads[i], NULL, receive_piece, (void*)&args) != 0) {
+			if (pthread_create(&threads[i], NULL, receive_piece, (void*)&args[i]) != 0) {
 				perror("pthread_create");
 				exit(1);
 			}
