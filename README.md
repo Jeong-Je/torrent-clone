@@ -25,3 +25,20 @@
 3. 시드들과 `P2P` 통신으로 파일 다운로드
 
 ## Tracker
+
+ㅋㅋ
+
+# 'a'로 1333395456바이트를 채운 파일 생성
+dd if=/dev/zero bs=1M count=1277 | tr '\0' 'a' > part_a.txt
+
+# 'b'로 1333395456바이트를 채운 파일 생성
+dd if=/dev/zero bs=1M count=1277 | tr '\0' 'b' > part_b.txt
+
+# 'c'로 1333209088바이트를 채운 파일 생성
+dd if=/dev/zero bs=1M count=1276 | tr '\0' 'c' > part_c.txt
+
+# 세 파일을 결합하여 최종 파일을 생성
+cat part_a.txt part_b.txt part_c.txt > output.txt
+
+# 생성된 파일을 확인 (파일 크기)
+ls -lh output.txt
