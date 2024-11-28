@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
 		// 스레드 함수의 매개 변수
 		pthread_t threads[peer_num];
-		thread_args args;
+		down_request_targs args;
 		args.meta_data = meta;
 		// args.seed_IP = seed_IP;
 		strcpy(args.temp_file_name, temp_file_name);
