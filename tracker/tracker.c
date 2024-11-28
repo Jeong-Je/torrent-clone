@@ -34,6 +34,14 @@ int main(){
 		exit(1);
 	}
 
+	// 포트 재사용
+	int opt = 1;
+	if (setsockopt(sd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
+			perror("setsockopt 실패");
+			close(sd);
+			exit(EXIT_FAILURE);
+	}
+
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons(PORTNUM);
 	server_address.sin_addr.s_addr = inet_addr("0.0.0.0");

@@ -10,6 +10,7 @@
 #include "env.h"
 #include "receive_piece.h"
 #include "meta.h"
+#include <sys/socket.h>
 
 // 스레드 함수 매개변수 구조체
 typedef struct {
@@ -82,6 +83,14 @@ void send_pieces() {
     if (server_fd == 0) {
         perror("소켓 생성 실패");
         exit(EXIT_FAILURE);
+    }
+
+    // 포트 재사용
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
+            perror("setsockopt 실패");
+            close(server_fd);
+            exit(EXIT_FAILURE);
     }
 
     server_addr.sin_family = AF_INET;

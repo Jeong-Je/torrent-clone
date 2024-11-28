@@ -7,9 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <sys/socket.h>
 #include "env.h"
 #include "meta.h"
 #include "receive_piece.h"
+
 
 
 void* receive_piece(void* vargs){
@@ -52,6 +54,14 @@ void* receive_piece(void* vargs){
         if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
                 perror("socket");
                 exit(1);
+        }
+
+        // 포트 재사용
+        int opt = 1;
+        if (setsockopt(sd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
+                perror("setsockopt 실패");
+                close(sd);
+                exit(EXIT_FAILURE);
         }
 
         memset((char *)&sin, '\0', sizeof(sin));
