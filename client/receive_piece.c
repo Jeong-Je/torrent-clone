@@ -99,7 +99,7 @@ void* receive_piece(void* vargs){
                 // 할당한 저장공간에 수신한 피스 배치
                 lseek(fd, i * meta_data.piece_length, SEEK_SET);
                 write(fd, payload_buf, received_piece_size);
-                printf("피스 배치 완료\n");
+                // printf("피스 배치 완료\n");
         }
 
         close(sd);
