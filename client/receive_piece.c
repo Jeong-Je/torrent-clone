@@ -103,7 +103,7 @@ void* receive_piece(void* vargs){
         }
 
         close(sd);
-        close(fd);
+        // close(fd);
 
         
         pthread_exit(NULL);

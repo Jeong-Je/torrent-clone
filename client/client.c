@@ -64,14 +64,34 @@ int main(int argc, char *argv[]) {
 
 		int peer_num = 0;
 		char** seed_IP_arr;
-		seed_IP_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
+		// seed_IP_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
 		
-		printf("seed_IP_arr[0]: %s\n", seed_IP_arr[0]);
+		// printf("seed_IP_arr[0]: %s\n", seed_IP_arr[0]);
 
-		if (peer_num == 0){
-			perror("다운받을 수 없습니다.");
-			exit(1);
+		// if (peer_num == 0){
+		// 	perror("다운받을 수 없습니다.");
+		// 	exit(1);
+		// }
+
+		// test
+		peer_num = 1;
+
+		// char** 배열 동적 할당
+		seed_IP_arr = (char**)malloc(peer_num * sizeof(char*));
+		if (seed_IP_arr == NULL) {
+			perror("메모리 할당 실패");
+			return 1;
 		}
+
+		// 각 문자열 공간 할당 및 값 복사
+		seed_IP_arr[0] = (char*)malloc(strlen("127.0.0.1") + 1); // 문자열 크기 + 1(NULL 문자)
+		if (seed_IP_arr[0] == NULL) {
+			perror("메모리 할당 실패");
+			free(seed_IP_arr);
+			return 1;
+		}
+		strcpy(seed_IP_arr[0], "127.0.0.1");
+		// test
 
 		// 분배할 조각의 수와 피어의 수에 따라 인덱스 나누기
 		int index_term = meta.piece_num / peer_num;
@@ -137,11 +157,12 @@ int main(int argc, char *argv[]) {
 		// 	exit(1);
 		// }
 
-		int finalfd = open(meta.name, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+		int finalfd = open(meta.name, O_CREAT | O_WRONLY, 0644);
 		char buf[4096]; // 버퍼 크기 확장
-		
+		int n;
 		for (int i = 0; i < peer_num; i++) {
-			int n;
+			printf("finalfd: %d\n", finalfd);
+			printf("fd[%d]: %d\n", i, fd[i]);
 			while ((n = read(fd[i], buf, sizeof(buf))) > 0) {
 				if (write(finalfd, buf, n) != n) {
 					perror("Write error");
@@ -154,6 +175,10 @@ int main(int argc, char *argv[]) {
 				close(finalfd);
 				exit(EXIT_FAILURE);
 			}
+		}
+
+		for (int i=0; i<peer_num; i++){
+			close(fd[i]);
 		}
 
 
