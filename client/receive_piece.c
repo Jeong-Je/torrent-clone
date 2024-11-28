@@ -30,7 +30,7 @@ void* receive_piece(void* vargs){
         // 파일 수신할 버퍼 및 변수
         int sd;
         int header_size = atoi(get_env("PIECE_HEADER_SIZE"));
-        int payload_size = atoi(get_env("PIECE_LENGTH"));
+        int payload_size = meta_data.piece_length;
         char header_buf[header_size];
         char payload_buf[payload_size];
         int64_t received_piece_index;
@@ -38,7 +38,7 @@ void* receive_piece(void* vargs){
         
         // 피스 파일 요청 구조체
         file_request req;
-        strcpy(req.filename, meta_data.name);
+        req.meta_data = meta_data;
         req.start_chunk = start_index;
         req.end_chunk = end_index;
 
@@ -105,5 +105,5 @@ void* receive_piece(void* vargs){
         close(fd);
 
         
-        pthread_exit(1);
+        pthread_exit(NULL);
 }
