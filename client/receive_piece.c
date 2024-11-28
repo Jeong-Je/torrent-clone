@@ -6,22 +6,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include "env.h"
 #include "meta.h"
 #include "receive_piece.h"
-
-// 피스 파일 요청 구조체
-typedef struct {
-    char filename[256];
-    int64_t start_chunk;
-    int64_t end_chunk;
-} file_request;
 
 
 void* receive_piece(void* vargs){
         printf("receive_piece 실행\n");
         // 스레드 매개변수 할당
-        thread_args* args = (thread_args*)vargs;
+        down_request_targs* args = (down_request_targs*)vargs;
         meta meta_data = args->meta_data;
         int start_index = args->start_index;
         int end_index = args->end_index;
@@ -32,12 +26,6 @@ void* receive_piece(void* vargs){
         
         printf("startindex: %d\n", start_index);
         printf("endindex: %d\n", end_index);
-
-        // struct in_addr ip_addr;
-        // ip_addr.s_addr = seed_IP;  // in_addr 구조체에 복사
-
-        // printf("IP Address: %s\n", inet_ntoa(ip_addr));
-        
 
         // 파일 수신할 버퍼 및 변수
         int sd;
@@ -108,7 +96,7 @@ void* receive_piece(void* vargs){
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
-                lseek(fd, start_index * meta_data.piece_length, SEEK_SET);
+                lseek(fd, i * meta_data.piece_length, SEEK_SET);
                 write(fd, payload_buf, received_piece_size);
                 printf("피스 배치 완료\n");
         }
