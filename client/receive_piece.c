@@ -11,6 +11,20 @@
 #include "meta.h"
 #include "receive_piece.h"
 
+typedef struct {
+    int fd;
+    int piece_length;
+    char* piece;
+    int piece_size;
+    int i;
+} merge_piece_structs;
+
+void* merge_piece(void* vargs){
+        merge_piece_structs* args = (merge_piece_structs*)vargs;
+
+        lseek(args->fd, args->i * args->piece_length, SEEK_SET);
+        write(args->fd, args->piece, args->piece_size);
+}
 
 void* receive_piece(void* vargs){
         printf("receive_piece 실행\n");
@@ -96,8 +110,21 @@ void* receive_piece(void* vargs){
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
-                lseek(fd, i * meta_data.piece_length, SEEK_SET);
-                write(fd, payload_buf, received_piece_size);
+                // 스레드 생성
+                pthread_t thread;
+                merge_piece_structs args;
+                args.fd = fd;
+                args.i = i;
+                strcpy(args.piece, payload_buf);
+                args.piece_length = meta_data.piece_length;
+                args.piece_size = received_piece_size;
+
+                if (pthread_create(&thread, NULL, merge_piece, (void*)&args) != 0) {
+                        perror("pthread_create");
+                        exit(1);
+                }
+                // lseek(fd, i * meta_data.piece_length, SEEK_SET);
+                // write(fd, payload_buf, received_piece_size);
                 printf("피스 배치 완료\n");
         }
 
