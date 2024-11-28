@@ -77,7 +77,7 @@ char** request_tracker(char *announce, char *file_name, int* peer_num){
 
 
     printf("peernum: %d\n", *peer_num);
-    for (int i=0; i<5; i++){
+    for (int i=0; i<*peer_num; i++){
         if(ip_arr[i] == NULL) break;
            
         printf("ptr: %s\n", ip_arr[i]);
