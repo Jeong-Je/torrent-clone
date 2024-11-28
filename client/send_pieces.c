@@ -9,27 +9,29 @@
 #include <pthread.h>
 #include "env.h"
 #include "receive_piece.h"
+#include "meta.h"
 
 // 스레드 함수 매개변수 구조체
 typedef struct {
-    char filename[256];
+    int client_socket;
+    meta meta_data;
     int64_t start_chunk;
     int64_t end_chunk;
-    int client_socket;
 } thread_args;
 
 // 클라이언트 요청을 처리하는 함수
 void* handle_client(void* varg) {
-    int header_size = atoi(get_env("PIECE_HEADER_SIZE"));
-    int piece_size = atoi(get_env("PIECE_LENGTH"));
-    
     thread_args* args = (thread_args*)varg;
+
+    int header_size = atoi(get_env("PIECE_HEADER_SIZE"));
+    int piece_size = args->meta_data.piece_length;
+    
     char buffer[piece_size + header_size];
     ssize_t bytes_read;
     int64_t chunk_index = 0;
 
     // 파일 열기
-    int file_fd = open(args->filename, O_RDONLY);
+    int file_fd = open(args->meta_data.name, O_RDONLY);
     if (file_fd < 0) {
         perror("파일 열기 실패");
         close(args->client_socket);
@@ -68,11 +70,8 @@ void send_pieces() {
 
     char* port_str = get_env("SERVER_PORT");
     char* header_size_str = get_env("PIECE_HEADER_SIZE");
-    char* piece_size_str = get_env("PIECE_LENGTH");
 
     int port = atoi(port_str);
-    int header_size = atoi(header_size_str);
-    int piece_size = atoi(piece_size_str);
 
     int server_fd;
     struct sockaddr_in server_addr, client_addr;
@@ -120,12 +119,12 @@ void send_pieces() {
             continue;
         }
 
-        printf("수신된 요청 - 파일명: %s, 시작 인덱스: %lld, 끝 인덱스: %lld\n", request->filename, request->start_chunk, request->end_chunk);
+        printf("수신된 요청 - 파일명: %s, 시작 인덱스: %lld, 끝 인덱스: %lld\n", request->meta_data.name, request->start_chunk, request->end_chunk);
 
         // 스레드 함수 매개변수 설정
         thread_args* args = (thread_args*)malloc(sizeof(thread_args));
-        strcpy(args->filename, request->filename);
         args->client_socket = client_socket;
+        args->meta_data = request->meta_data;
         args->start_chunk = request->start_chunk;
         args->end_chunk = request->end_chunk;
         

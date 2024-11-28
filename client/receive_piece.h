@@ -16,7 +16,7 @@ typedef struct {
 
 // 피스 파일 요청 구조체
 typedef struct {
-    char filename[256];
+    meta meta_data;
     int64_t start_chunk;
     int64_t end_chunk;
 } file_request;

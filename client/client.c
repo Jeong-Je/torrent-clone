@@ -61,15 +61,11 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr, "메타데이터 파싱 실패.");
 		}
 
-		int peer_num = 1;
-		
-		// in_addr_t seed_IP;
+		int peer_num = 0;
 		char** seed_IP_arr;
-		
-
 		seed_IP_arr = request_tracker(meta.announce, meta.name, &peer_num); // 트래커 서버로 피어 주라고 요청하기
 		
-		printf("seed_IP_arr: %s\n", seed_IP_arr[0]);
+		printf("seed_IP_arr[0]: %s\n", seed_IP_arr[0]);
 
 		if (peer_num == 0){
 			perror("다운받을 수 없습니다.");
