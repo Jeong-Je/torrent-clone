@@ -81,7 +81,7 @@ void* receive_piece(void* vargs){
         }
 
         // 파일 받기
-        for (int i=start_index; i<=end_index; i++){
+        for (int i=0; i<=end_index - start_index; i++){
                 // 헤더 수신
                 ssize_t bytes_received = recv(sd, header_buf, header_size, MSG_WAITALL);
                 if (bytes_received <= 0) break;
@@ -97,6 +97,7 @@ void* receive_piece(void* vargs){
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
+                // lseek(fd, i * meta_data.piece_length, SEEK_SET);
                 lseek(fd, i * meta_data.piece_length, SEEK_SET);
                 write(fd, payload_buf, received_piece_size);
                 // printf("피스 배치 완료\n");

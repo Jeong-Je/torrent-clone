@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 		for (int i=0; i<peer_num; i++){
 			args[i].meta_data = meta;
 			//strcpy(args[i].temp_file_name, temp_file_name);
-			args->fd = fd[i];
+			args[i].fd = fd[i];
 			end_index = start_index + index_term -1;
 			if (i<addition_term){
 				end_index++;
