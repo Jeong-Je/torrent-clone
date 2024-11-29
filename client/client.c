@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 			pthread_join(threads[i], NULL);
 		}
 
-		다운로드 완료시 원래 파일 이름으로 변경
+		//다운로드 완료시 원래 파일 이름으로 변경
 		if (rename(temp_file_name, meta.name) == 0) {
         printf("파일 이름이 성공적으로 변경되었습니다.");
 		} else {
