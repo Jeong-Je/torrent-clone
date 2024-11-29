@@ -10,8 +10,7 @@
 #include <arpa/inet.h>   // sockaddr_in, htons 등
 #include <unistd.h>      // close()
 
-
-#define MAX_SEEDS 5
+#include "env.h"
 
 int give_seed(char* file_name, int new_socket);
 

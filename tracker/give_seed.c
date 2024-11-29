@@ -3,13 +3,17 @@
 int give_seed(char* file_name, int new_socket) {
     printf("give_seed 함수 호출\n");
 
+    char* max_client_str = get_env("MAX_CLIENT");
+    int max_client = atoi(max_client_str);
+    free(max_client_str);
+
     int seeds_index = 0;
     char line[256];
     char file_path[256];
-    char* seeds[MAX_SEEDS];
+    char* seeds[max_client];
     FILE* file;
 
-    for (int i = 0; i < MAX_SEEDS; i++) {
+    for (int i = 0; i < max_client; i++) {
         seeds[i] = NULL;
     }
 
@@ -70,7 +74,7 @@ int give_seed(char* file_name, int new_socket) {
 
     fclose(file);
 
-    for (int i = 0; i < MAX_SEEDS; i++) {
+    for (int i = 0; i < max_client; i++) {
         free(seeds[i]); // 메모리 해제
     }
 
