@@ -42,6 +42,8 @@ int main(){
 			exit(EXIT_FAILURE);
 	}
 
+
+
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons(PORTNUM);
 	server_address.sin_addr.s_addr = inet_addr("0.0.0.0");
