@@ -49,7 +49,7 @@ void* handle_client(void* varg) {
             memcpy(buffer, &chunk_index, sizeof(chunk_index));                  // 인덱스
             memcpy(buffer + sizeof(chunk_index), &bytes_read, sizeof(bytes_read)); // 크기
             
-            usleep(300000); // 네트워크 속도 제한을 위한 usleep
+            usleep(10000); // 네트워크 속도 제한을 위한 usleep
 
             if (send(args->client_socket, buffer, header_size + bytes_read, 0) < 0) {
                 perror("조각 전송 실패");
