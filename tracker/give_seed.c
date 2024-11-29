@@ -1,61 +1,5 @@
 #include "give_seed.h"
 
-
-int give_random(char file_path[256], char* seeds[MAX_SEEDS], int seed_cnt) {
-    FILE* file;
-    char line[256];
-    int seeds_index = 0;
-
-    file = fopen(file_path, "rb");
-    if (file == NULL) {
-        perror("fopen err");
-        exit(1);
-    }
-
-    bool* gived_seed = malloc(sizeof(bool) * (seed_cnt + 1)); // 고정
-    if (gived_seed == NULL) {
-        perror("malloc failed");
-        exit(1);
-    }
-
-    for (int i = 0; i <= seed_cnt; i++) {
-        gived_seed[i] = false;
-    }
-
-    srand(time(0));
-    for (int i = 0; i < 5; i++) {
-        int random_value = rand() % seed_cnt + 1;
-        while (gived_seed[random_value]) {
-            random_value = rand() % seed_cnt + 1;
-        }
-
-        int temp = 1;
-        while (temp < random_value && fgets(line, 256, file)) {
-            temp++;
-        }
-
-        fgets(line, 256, file); // 랜덤한 줄 읽기
-
-        seeds[seeds_index] = malloc(256 * sizeof(char)); // 메모리 할당
-        if (seeds[seeds_index] == NULL) {
-            perror("malloc failed");
-            exit(1);
-        }
-
-		int len = strlen(line); line[len-1] = '\0';
-        strcpy(seeds[seeds_index], line);
-
-        gived_seed[random_value] = true;
-        memset(line, '\0', sizeof(line));
-        fseek(file, 0, SEEK_SET);
-        seeds_index++;
-    }
-
-    free(gived_seed);
-    fclose(file);
-    return seeds_index;
-}
-
 int give_seed(char* file_name, int new_socket) {
     printf("give_seed 함수 호출\n");
 
@@ -84,9 +28,7 @@ int give_seed(char* file_name, int new_socket) {
 
     printf("seed_cnt : %d\n", seed_cnt);
 
-    if (seed_cnt > 5) {
-        seeds_index = give_random(file_path, seeds, seed_cnt);
-    } else if (seed_cnt == 0) {
+    if (seed_cnt == 0) {
         printf("There is not seeds.\n");
     } else {
         fseek(file, 0, SEEK_SET);
@@ -99,6 +41,7 @@ int give_seed(char* file_name, int new_socket) {
                 }
 				
 				int len = strlen(line); line[len-1] = '\0';
+                printf("hi there > %s\n", line);
                 strcpy(seeds[i], line);
             }
         }
