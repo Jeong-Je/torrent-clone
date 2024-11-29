@@ -24,8 +24,8 @@ void* receive_piece(void* vargs){
         char seed_IP[16];
         strcpy(seed_IP, args->seed_IP);
         char temp_file_name[256];
-        // strcpy(temp_file_name, args->temp_file_name);
-        int fd = args->fd;
+        strcpy(temp_file_name, args->temp_file_name);
+        
         
         printf("startindex: %d\n", start_index);
         printf("endindex: %d\n", end_index);
@@ -78,11 +78,11 @@ void* receive_piece(void* vargs){
         printf("connect 후\n");
 
         // 할당한 저장공간 열기
-        // int fd = open(temp_file_name, O_WRONLY, 0644);
-        // if (fd == -1){
-        //         perror("임시 파일 열기 실패");
-        //         exit(1);
-        // }
+        int fd = open(temp_file_name, O_WRONLY, 0644);
+        if (fd == -1){
+                perror("임시 파일 열기 실패");
+                exit(1);
+        }
 
         // 피스 파일 요청 구조체 송신
         if (send(sd, &req, sizeof(req), 0) == -1){
@@ -91,7 +91,7 @@ void* receive_piece(void* vargs){
         }
 
         // 파일 받기
-        for (int i=0; i<=end_index - start_index; i++){
+        for (int i=start_index; i<=end_index; i++){
                 // 헤더 수신
                 ssize_t bytes_received = recv(sd, header_buf, header_size, MSG_WAITALL);
                 if (bytes_received <= 0) break;
@@ -114,7 +114,7 @@ void* receive_piece(void* vargs){
         }
 
         close(sd);
-        // close(fd);
+        close(fd);
 
         
         pthread_exit(NULL);

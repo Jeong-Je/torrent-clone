@@ -12,7 +12,7 @@ typedef struct {
     int end_index;
     char seed_IP[16];
     int seed_port;
-    int fd;
+    char* temp_file_name;
 } down_request_targs;
 
 // 피스 파일 요청 구조체
