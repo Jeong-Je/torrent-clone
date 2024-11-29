@@ -10,7 +10,6 @@
 #include <pthread.h>
 
 #include "request_thread.h"
-#include "env.h"
 
 #define PORTNUM 32132
 #define CLIENT_MAX  10
@@ -18,7 +17,6 @@
 typedef struct { 	// request_thread 함수로 넘길 인자 
 	struct sockaddr_in client_address;
 	int new_socket;
-	int base_port_num;
 } Arg;
 
 int main(){
@@ -37,12 +35,12 @@ int main(){
 	}
 
 	// 포트 재사용
-	// int opt = 1;
-	// if (setsockopt(sd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
-	// 		perror("setsockopt 실패");
-	// 		close(sd);
-	// 		exit(EXIT_FAILURE);
-	// }
+	int opt = 1;
+	if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1) {
+			perror("setsockopt 실패");
+			close(server_socket);
+			exit(EXIT_FAILURE);
+	}
 
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons(PORTNUM);
@@ -62,11 +60,8 @@ int main(){
         exit(1);
     }
 
-	int base_port_num = atoi(get_env("BASE_SERVER_PORT")); //32132
-	//printf("base_port_num > %d\n", base_port_num);
-
 	while(1) {
-		Arg *arg1 = malloc(sizeof(Arg));
+		Arg arg1;
 		int *new_socket = malloc(sizeof(int));  // 동일한 소켓이 전달되지 않도록 동적 메모리 할당
 
 		if((*new_socket = accept(server_socket, (struct sockaddr*)&client_address, (socklen_t *)&clientlen)) < 0) {
@@ -75,12 +70,10 @@ int main(){
 			exit(1);
 		}
 
-		arg1->new_socket = *new_socket;
-		arg1->client_address = client_address;	//인자 세팅
-		arg1->base_port_num = ++base_port_num; // base port num 
-		//printf("aaa > %d\n", *(arg1.base_port_num));
+		arg1.new_socket = *new_socket;
+		arg1.client_address = client_address;	//인자 세팅
 
-		if(pthread_create(&tid, NULL, request_thread, (void*)arg1) != 0){
+		if(pthread_create(&tid, NULL, request_thread, (void*)&arg1) != 0){
 
 			perror("pthread_create err");
 			free(new_socket);

@@ -2,7 +2,7 @@
 #include "is_seed.h"
 
 int update_seedlist(Request req){
-    printf("파일명 = %s, 클라이언트 IP = %s 포트 = %d\n", req.file_name, req.client_ip, (req.port_num));
+    printf("파일명 = %s, 클라이언트 IP = %s\n", req.file_name, req.client_ip);
 
 	FILE *file; // 시드 리스트 관리할 파일 포인터
 
@@ -28,13 +28,8 @@ int update_seedlist(Request req){
 	} else{	// 아직 아닌경우
 
 		// 파일에 클라 ip 기록
-		fprintf(file, "%s:%d\n", req.client_ip, req.port_num);
+		fprintf(file, "%s\n", req.client_ip);
 		printf("시드리스트가 갱신되었습니다.\n");
-
-		if(send(req.new_socket, &(req.port_num), sizeof(req.port_num), 0) == -1){
-			perror("send");
-			exit(1);
-		}
 	}
 
 	fclose(file);
