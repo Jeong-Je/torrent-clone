@@ -77,26 +77,6 @@ int main(int argc, char *argv[]) {
 			exit(1);
 		}
 
-		// test
-		// peer_num = 1;
-
-		// // char** 배열 동적 할당
-		// seed_IP_arr = (char**)malloc(peer_num * sizeof(char*));
-		// if (seed_IP_arr == NULL) {
-		// 	perror("메모리 할당 실패");
-		// 	return 1;
-		// }
-
-		// // 각 문자열 공간 할당 및 값 복사
-		// seed_IP_arr[0] = (char*)malloc(strlen("127.0.0.1") + 1); // 문자열 크기 + 1(NULL 문자)
-		// if (seed_IP_arr[0] == NULL) {
-		// 	perror("메모리 할당 실패");
-		// 	free(seed_IP_arr);
-		// 	return 1;
-		// }
-		// strcpy(seed_IP_arr[0], "127.0.0.1");
-		// test
-
 		// 분배할 조각의 수와 피어의 수에 따라 인덱스 나누기
 		int index_term = meta.piece_num / peer_num;
 		int addition_term = meta.piece_num % peer_num;
@@ -107,17 +87,14 @@ int main(int argc, char *argv[]) {
 		// 저장공간 할당
 		char temp_file_name[256];
 		allocate_storage(meta, temp_file_name);
-		
-    	// int fd[peer_num];
-		// for (int i=0; i<peer_num; i++){
-		// 	sprintf(temp_file_name, "%s_temp_%d", meta.name, i);
-		// 	fd[i] = open(temp_file_name, O_CREAT | O_RDWR, 0644);
-		// }
 
 		// 스레드 함수의 매개 변수
 		pthread_t threads[peer_num];
 		down_request_targs args[peer_num];
-		
+
+		// 다운로드 진행바
+		int downloaded_pieces = 0;
+		pthread_mutex_t progress_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 		// 설정한 인덱스에 따라 다운로드 요청
 		for (int i=0; i<peer_num; i++){
@@ -134,9 +111,12 @@ int main(int argc, char *argv[]) {
    			}
 
 			strcpy(args[i].seed_IP, seed_IP_arr[i]);
-			//printf("seedIP(main): %s", args.seed_IP);
+			//printf("seedIP(main): %s", args.seed_IP); // debug
 			args[i].start_index = start_index;
 			args[i].end_index = end_index;
+
+			args[i].mutex = &progress_mutex;
+			args[i].downloaded_pieces = &downloaded_pieces;
 
 			// 스레드 생성
 			if (pthread_create(&threads[i], NULL, receive_piece, (void*)&args[i]) != 0) {
@@ -153,7 +133,7 @@ int main(int argc, char *argv[]) {
 
 		//다운로드 완료시 원래 파일 이름으로 변경
 		if (rename(temp_file_name, meta.name) == 0) {
-        printf("파일 이름이 성공적으로 변경되었습니다.");
+        printf("파일 이름이 성공적으로 변경되었습니다.\n");
 		} else {
 			perror("파일 이름 변경 실패");
 			exit(1);
@@ -164,7 +144,7 @@ int main(int argc, char *argv[]) {
 
 		double diffTime = (end.tv_sec - start.tv_sec) + ((end.tv_usec - start.tv_usec) / 1000000.0);
 
-		printf("다운로드 소요 시간 : %f sec", diffTime);
+		printf("다운로드 소요 시간 : %f sec\n", diffTime);
 
 
 	} else {

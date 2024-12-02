@@ -15,6 +15,8 @@
 
 // 스레드 함수 매개변수 구조체
 typedef struct {
+    pthread_mutex_t *mutex;
+    int* uploaded_pieces;
     int client_socket;
     meta meta_data;
     int64_t start_chunk;
@@ -59,6 +61,12 @@ void* handle_client(void* varg) {
                 pthread_exit(NULL);
             }
             // printf("송신: 조각 %lld (%ld 바이트)\n", chunk_index, bytes_read);
+            
+            // 피스 업로드 진행바
+            pthread_mutex_lock(args->mutex);
+            (*(args->uploaded_pieces))++;
+            print_progress_bar(*(args->uploaded_pieces), args->meta_data.piece_num);
+            pthread_mutex_unlock(args->mutex);
         }
         if (chunk_index > args->end_chunk) break;
         chunk_index++;
@@ -149,6 +157,11 @@ void send_pieces() {
 
         // 새로운 스레드 생성하여 클라이언트 요청 처리
         pthread_t thread_id;
+        int uploaded_pieces = 0;
+		pthread_mutex_t progress_mutex = PTHREAD_MUTEX_INITIALIZER;
+        args->mutex = &progress_mutex;
+		args->uploaded_pieces = &uploaded_pieces;
+        
         if (pthread_create(&thread_id, NULL, handle_client, (void*)args) != 0) {
             perror("스레드 생성 실패");
             close(client_socket);

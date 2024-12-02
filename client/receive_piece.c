@@ -11,13 +11,15 @@
 #include "env.h"
 #include "meta.h"
 #include "receive_piece.h"
-
+#include "progress_bar.h"
 
 
 void* receive_piece(void* vargs){
         printf("receive_piece 실행\n");
         // 스레드 매개변수 할당
         down_request_targs* args = (down_request_targs*)vargs;
+        pthread_mutex_t *mutex = args->mutex;
+        int* downloaded_pieces = args->downloaded_pieces;
         meta meta_data = args->meta_data;
         int start_index = args->start_index;
         int end_index = args->end_index;
@@ -98,19 +100,24 @@ void* receive_piece(void* vargs){
 
                 memcpy(&received_piece_index, header_buf, sizeof(received_piece_index));
                 memcpy(&received_piece_size, header_buf + sizeof(received_piece_index), sizeof(received_piece_size));
-                // printf("piece index: %d\n", received_piece_index);
-                // printf("piece size: %d\n", received_piece_size);
+                // printf("piece index: %d\n", received_piece_index); // debug
+                // printf("piece size: %d\n", received_piece_size); // debug
                 
                 // 피스 파일 수신
                 bytes_received = recv(sd, payload_buf, received_piece_size, MSG_WAITALL);
-                // printf("received piece: %s\n", payload_buf);
+                // printf("received piece: %s\n", payload_buf); // debug
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
-                // lseek(fd, i * meta_data.piece_length, SEEK_SET);
                 lseek(fd, i * meta_data.piece_length, SEEK_SET);
                 write(fd, payload_buf, received_piece_size);
-                // printf("피스 배치 완료\n");
+                // printf("피스 배치 완료\n"); // debug
+
+                // 피스 다운로드 진행바
+                pthread_mutex_lock(mutex);
+                (*downloaded_pieces)++;
+                print_progress_bar(*downloaded_pieces, meta_data.piece_num);
+                pthread_mutex_unlock(mutex);
         }
 
         close(sd);

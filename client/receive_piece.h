@@ -4,9 +4,12 @@
 
 #include <netinet/in.h>
 #include "meta.h"
+#include <pthread.h>
 
 // 다운로드 요청 스레드 함수 매개 변수
 typedef struct {
+    pthread_mutex_t *mutex;
+    int *downloaded_pieces;
     meta meta_data;
     int start_index;
     int end_index;
