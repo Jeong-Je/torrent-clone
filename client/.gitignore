@@ -10,4 +10,4 @@ port.txt
 .DS_Store
 
 # env 파일 무시
-.env
+# .env
