@@ -1,3 +1,6 @@
+#define _LARGEFILE64_SOURCE
+#define _LARGEFILE_SOURCE
+#define _FILE_OFFSET_BITS   64
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <string.h>
@@ -80,8 +83,8 @@ void* receive_piece(void* vargs){
         printf("connect 후\n");
 
         // 할당한 저장공간 열기
-        int fd = open(temp_file_name, O_WRONLY, 0644);
-        if (fd == -1){
+        FILE* fd = fopen(temp_file_name, "ab");
+        if (fd == NULL){
                 perror("임시 파일 열기 실패");
                 exit(1);
         }
@@ -109,8 +112,8 @@ void* receive_piece(void* vargs){
                 if (bytes_received <= 0) break;
 
                 // 할당한 저장공간에 수신한 피스 배치
-                lseek(fd, i * meta_data.piece_length, SEEK_SET);
-                write(fd, payload_buf, received_piece_size);
+                fseeko(fd, i * meta_data.piece_length, SEEK_SET);
+                fwrite(payload_buf, 1, sizeof(payload_buf), fd);
                 // printf("피스 배치 완료\n"); // debug
 
                 // 피스 다운로드 진행바
@@ -121,7 +124,7 @@ void* receive_piece(void* vargs){
         }
 
         close(sd);
-        close(fd);
+        fclose(fd);
 
         
         pthread_exit(NULL);
