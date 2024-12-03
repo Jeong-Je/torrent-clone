@@ -27,8 +27,8 @@ void bencode_list_end(FILE *fp) {
     fprintf(fp, "e");
 }
 
-void bencode_int(FILE *fp, int value){
-        fprintf(fp, "i%de", value);
+void bencode_int(FILE *fp, long long value){
+        fprintf(fp, "i%llde", value);
 }
 
 void bencode_string(FILE *fp, char* str){
