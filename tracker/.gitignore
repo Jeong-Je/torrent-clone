@@ -7,7 +7,7 @@ test_client
 seed_List
 
 # env
-# .env
+.env
 
 # OS-specific
 .DS_Store
