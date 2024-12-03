@@ -3,7 +3,7 @@
 </a>
 
 
-# 리눅스에서 C언어로 토렌트 구현하기
+# 리눅스에서 C언어로 토렌트 구현하기 냥!
 <div style="display: flex;">
   <img src="https://img.shields.io/badge/Linux-FFE005?style=flat&logo=Linux&logoColor=black" width="150" height="50" />
   <img src="https://img.shields.io/badge/C-00599C?style=flat&logo=C&logoColor=white" width="150" height="50" />
