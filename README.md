@@ -1,7 +1,7 @@
 <a href="https://github.com/Jeong-Je/torrent-clone/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Jeong-Je/torrent-clone" />
 </a>
-
+: みんな~頑張ろう！
 
 # 리눅스에서 C언어로 토렌트 구현하기 냥!
 <div style="display: flex;">
