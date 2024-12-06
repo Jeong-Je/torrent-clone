@@ -146,7 +146,8 @@ int main(int argc, char *argv[]) {
 
 		printf("다운로드 소요 시간 : %f sec\n", diffTime);
 
-		if(report_to_tracker(meta.name)){
+		sprintf(torrent_path, "%s%s", meta.name, ".torrent");
+		if(report_to_tracker(torrent_path)){
 			printf("트래커 서버로 보고 완료\n");
 		}else {
 			printf("트래커 서버로 보고 실패\n");
