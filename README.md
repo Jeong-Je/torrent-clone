@@ -10,6 +10,10 @@
   <img src="https://img.shields.io/badge/BitTorrent-6C47FF?style=flat&logo=BitTorrent&logoColor=white" width="150" height="50" />
 </div>
 
+# 목표
+1. 시드의 수가 늘어남에 따라 다운로드 속도가 증가되는지?
+2. "이상적인 시드의 수 = cpu 코어 x 2" ?
+
 
 
 ## Client
