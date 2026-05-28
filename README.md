@@ -1,7 +1,6 @@
 <a href="https://github.com/Jeong-Je/torrent-clone/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Jeong-Je/torrent-clone" />
 </a>
-<br> みんな~頑張ろう！
 
 # 리눅스에서 C언어로 토렌트 구현하기
 <div style="display: flex;">
@@ -14,6 +13,14 @@
 1. 시드 수가 늘어날 때 다운로드 속도가 어떻게 변하는지 추적
 2. UTP와 TCP 중 어떤 프로토콜이 다운로드 속도가 더 빠른지 비교
 3. 피어 수가 CPU 코어 수의 2배일 때 다운로드 성능이 최적인지 확인
+
+# 핵심 로직
+<img width="495" height="409" alt="Image" src="https://github.com/user-attachments/assets/7269cd66-b4a5-422d-8367-671fd8984624" />
+
+1. 수신 노드가 서버에게 현재 파일 보유 중인 송신 노드의 리스트를 요청
+2. 수신한 송신 노드 리스트의 길이만큼 파일을 조각화
+3. 각 조각을 서로 다른 송신 노드에게 수신
+4. 수신한 조각들을 파일에 배치
 
 ## Client
 ### 실행 파일 만들기
